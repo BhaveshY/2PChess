@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two Player Chess</title>
+    <link rel="stylesheet" type="text/css" href="styles/game.css">
+</head>
+<body onload="bodyLoaded()">
+
+<div class="gameview">
+    <div class="leftpane">
+        <h2 style="text-align: center">Themes</h2>
+        <form>
+            <input type="radio" name="font" id="arialTheme" onclick="updateTheme(id)" checked>
+            <label for="arialTheme">Arial</label><br>
+
+            <input type="radio" name="font" id="freeSerifTheme" onclick="updateTheme(id)">
+            <label for="freeSerifTheme">Free Serif</label><br>
+
+            <input type="radio" name="font" id="dejaVuSansTheme" onclick="updateTheme(id)">
+            <label for="dejaVuSansTheme">Dejavu Sans</label><br>
+        </form>
+    </div>
+    <div class="middlepane">
+        <h1 style="text-align: center">Two Player Chess</h1>
+        <div id="popup" class="popup">
+            <h2>Game Over</h2>
+            <p id="winner"></p>
+            <button onclick="window.location.href='/index.html'">New Game</button>
+            <button onclick="closePopup()">Close</button>
+        </div>
+        <svg id="chessboard" style="background-color:#ffffff" width="100%" height="90%" viewBox="0 0 480 480" preserveAspectRatio="xMidYMid meet">
+            <!-- Chessboard squares -->
+            <g id="board">
+                <!-- Chessboard squares will be rendered here by JavaScript -->
+            </g>
+            <!-- Add chess pieces -->
+            <g id="pieces">
+                <!-- Pieces will be added dynamically by JavaScript -->
+            </g>
+        </svg>
+    </div>
+    <div class="rightpane">
+        <h2 style="text-align: center">Game Status</h2>
+        <p style="display: inline-block; margin-right: 10px;">Current Player:</p>
+        <p id="pl-name" style="text-align: center; display: inline-block;"></p>
+        <p id="pl-colour" style="text-align: center; display: inline-block;">⬤</p>
+    </div>
+</div>
+
+<script src="scripts/game.js"></script>
+</body>
+</html>

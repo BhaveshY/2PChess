@@ -1,0 +1,116 @@
+body {
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap');
+
+@font-face {
+    font-family: FreeSerif;
+    src: url(../fonts/FreeSerif.otf);
+}
+
+@font-face {
+    font-family: DejaVuSans;
+    src: url(../fonts/DejaVuSans.ttf);
+}
+
+.arialTheme {
+    font-family: 'Noto Sans', 'Arial Unicode MS', 'Arial', sans-serif !important;
+}
+
+.freeSerifTheme {
+    font-family: 'Noto Sans', 'FreeSerif', sans-serif !important;
+}
+
+.dejaVuSansTheme {
+    font-family: 'Noto Sans', 'DejaVuSans', sans-serif !important;
+}
+
+.leftpane {
+    width: 25%;
+    height: 100vh;
+    background-color: rosybrown;
+    padding: 16px;
+}
+
+.middlepane {
+    width: 50%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.rightpane {
+    width: 25%;
+    height: 100vh;
+    background-color: rosybrown;
+    padding: 16px;
+}
+
+.gameview {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+h1 {
+    width: 100%;
+    margin: 20px 0;
+}
+
+text {
+    pointer-events: none;
+    font-family: 'Noto Sans', 'Arial Unicode MS', 'Arial', sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    background-color: #eee;
+    border: 2px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+/* Chessboard styles */
+#chessboard {
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    margin: 0 auto;
+}
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    gap: 1px;
+    width: 100%;
+    height: 100%;
+}
+
+.square {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.white {
+    background-color: #f0d9b5;
+}
+
+.black {
+    background-color: #b58863;
+}

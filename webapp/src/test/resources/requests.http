@@ -1,0 +1,31 @@
+GET http://localhost:8080/game
+
+### Post polygon d4 of WHITE player
+POST http://localhost:8080/move
+Content-Type: text/plain
+
+Rd4
+
+### Post polygon a1 of BLACK player
+POST http://localhost:8080/move
+Content-Type: text/plain
+
+Ba1
+
+### Post polygon g3 of green player
+POST http://localhost:8080/move
+Content-Type: text/plain
+
+Gg3
+
+### Test response code 200
+POST http://localhost:8080/move
+Content-Type: text/plain
+
+Ra3
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}

@@ -1,0 +1,57 @@
+plugins {
+    id 'application'
+    id 'java'
+    id 'checkstyle'
+    id 'jacoco'
+}
+
+group = 'org.example'
+version = 'unspecified'
+
+repositories {
+    mavenCentral()
+}
+
+application {
+    // Define the main class for the application.
+    mainClass = 'main.GameMain'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+}
+
+jar {
+    //archiveBaseName = 'jchess'
+    //archiveVersion =  '0.1.0'
+    manifest {
+        attributes 'Main-Class': application.mainClass
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+checkstyle {
+    toolVersion = "9.0"
+    configFile = file("${rootProject.projectDir}/config/checkstyle.xml")
+	ignoreFailures = true
+    showViolations = true
+}
+
+dependencies {
+    implementation("com.google.guava:guava:33.0.0-jre")
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    // Use JUnit Platform for unit tests.
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+}
+

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Two Player Chess</title>
+    <link rel="stylesheet" type="text/css" href="styles/index.css">
+</head>
+<body>
+<h1>Welcome to 2 player chess!</h1>
+<div id="newgame">
+    <div>
+        <label for="pl1">White Player</label>
+        <input id="pl1" type="text" placeholder="Player 1" oninput="checkInputs()">
+        <span id="whiteKing">&#9812;</span>
+    </div>
+    <div>
+        <label for="pl2">Black Player</label>
+        <input id="pl2" type="text" placeholder="Player 2" oninput="checkInputs()">
+        <span id="blackKing">&#9818;</span>
+    </div>
+    <button id="newgamebtn" onclick="newGame()" disabled>New Game</button>
+</div>
+<div id="board"></div>
+<script src="scripts/index.js"></script>
+</body>
+</html>
