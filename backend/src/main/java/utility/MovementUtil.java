@@ -4,7 +4,6 @@ import common.Direction;
 import common.InvalidPositionException;
 import common.Position;
 import model.BasePiece;
-import model.Pawn;
 
 /**
  * MovementUtil - helper class for the movement of chess pieces
@@ -55,7 +54,6 @@ public class MovementUtil {
         try {
             return step(piece, step, current);
         } catch (InvalidPositionException e) {
-            Log.e(TAG, "Exception: "+e.getMessage());
             return null;
         }
     }
@@ -72,7 +70,6 @@ public class MovementUtil {
         try {
             return step(piece, step, current, reverse);
         } catch (InvalidPositionException e) {
-            Log.e(TAG, "Exception: "+e.getMessage());
             return null;
         }
     }

@@ -1,8 +1,9 @@
 package utility;
 
 import common.InvalidPositionException;
-import model.BasePiece;
 import common.Position;
+import common.Colour;
+import model.BasePiece;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,11 +28,15 @@ public class BoardAdapter {
         for(Position position: modelBoard.keySet()) {
             BasePiece piece = modelBoard.get(position);
             if(piece != null) {
-                viewBoard.put(position.toString().substring(1), piece.toString());
+                // Convert to standard chess notation (e.g., "e2")
+                String posStr = String.format("%c%d", 
+                    (char)('a' + position.getColumn()), 
+                    8 - position.getRow());  // Invert row for standard notation
+                viewBoard.put(posStr, piece.toString());
             }
         }
 
-        return  viewBoard;
+        return viewBoard;
     }
 
     /**
@@ -44,11 +49,35 @@ public class BoardAdapter {
         if(possibleMoves == null) {
             return Collections.emptyList();
         }
-        for(Position pi: possibleMoves) {
-            moves.add(pi.toString());
+        for(Position pos: possibleMoves) {
+            // Convert to standard chess notation (e.g., "e2")
+            String posStr = String.format("%c%d", 
+                (char)('a' + pos.getColumn()), 
+                8 - pos.getRow());  // Invert row for standard notation
+            moves.add(posStr);
         }
 
         return moves;
+    }
+
+    /**
+     * Convert standard chess notation to Position
+     * @param square The standard chess notation (e.g., "e2")
+     * @return Position object
+     */
+    public static Position getPositionFromNotation(String square, Colour colour) throws InvalidPositionException {
+        if(square == null || square.length() != 2 || !Character.isAlphabetic(square.charAt(0)) || !Character.isDigit(square.charAt(1))) {
+            throw new InvalidPositionException("Invalid String position: " + square);
+        }
+
+        char column = Character.toLowerCase(square.charAt(0));
+        int row = 8 - (square.charAt(1) - '0');  // Convert to 0-7 range
+        if(column < 'a' || column > 'h' || row < 0 || row > 7) {
+            throw new InvalidPositionException("Invalid String position: " + square);
+        }
+
+        int columnIndex = column - 'a';
+        return Position.get(colour, row, columnIndex);
     }
 
     /**
