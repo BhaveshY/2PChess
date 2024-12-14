@@ -1,8 +1,8 @@
 /* Updated game.js */
 
 const pieceMap = {
-    'R': '\u2656', 'N': '\u2658', 'B': '\u2657', 'Q': '\u2655', 'K': '\u2654', 'P': '\u2659',
-    'r': '\u265C', 'n': '\u265E', 'b': '\u265D', 'q': '\u265B', 'k': '\u265A', 'p': '\u265F'
+    'WR': '\u265C', 'WN': '\u265E', 'WB': '\u265D', 'WQ': '\u265B', 'WK': '\u265A', 'WP': '\u265F',
+    'BR': '\u2656', 'BN': '\u2658', 'BB': '\u2657', 'BQ': '\u2655', 'BK': '\u2654', 'BP': '\u2659'
 };
 
 const colorMap = {
@@ -180,14 +180,23 @@ function getPieceText(x, y, color, pieceToken) {
     textElement.setAttribute('y', y);
     textElement.setAttribute('text-anchor', 'middle');
     textElement.setAttribute('dominant-baseline', 'middle');
-    textElement.setAttribute('fill', getColorForDisplay(color));
-    textElement.setAttribute('font-size', '40');  // Adjusted size
+    
+    if (color === 'W') {
+        // White pieces (bottom)
+        textElement.setAttribute('fill', '#FFFFFF');
+        textElement.setAttribute('stroke', '#000000');
+        textElement.setAttribute('stroke-width', '0.5');
+    } else {
+        // Black pieces (top)
+        textElement.setAttribute('fill', '#000000');
+        textElement.setAttribute('stroke', 'none');
+    }
+    
+    textElement.setAttribute('font-size', '40');
     textElement.setAttribute('font-weight', 'bold');
-    textElement.setAttribute('stroke', color === 'W' ? '#000000' : '#FFFFFF');
-    textElement.setAttribute('stroke-width', '0.5');
     textElement.setAttribute('class', theme);
 
-    const unicode = pieceMap[pieceToken];
+    const unicode = pieceMap[color + pieceToken];
     textElement.textContent = unicode;
     console.log(`Rendering piece: ${pieceToken} (${unicode}) at (${x}, ${y}) with color ${colorMap[color]}`);
 
