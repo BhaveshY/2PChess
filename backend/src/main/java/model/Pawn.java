@@ -5,7 +5,6 @@ import common.Direction;
 import common.Position;
 import utility.Log;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -50,55 +49,74 @@ public class Pawn extends BasePiece {
         Set<Position> positionSet = new HashSet<>();
         Colour moverCol = this.getColour();
 
+        Log.d(TAG, String.format("\n=== CHECKING PAWN MOVES ==="));
+        Log.d(TAG, String.format("Pawn at %s, Color: %s", start, moverCol));
+
         // Check if pawn is in starting position
         boolean isInStartPosition = (moverCol == Colour.WHITE && start.getRow() == 6) || 
                                   (moverCol == Colour.BLACK && start.getRow() == 1);
+        Log.d(TAG, String.format("Is in starting position: %s", isInStartPosition));
 
         // Forward moves
         Position oneStep = stepOrNull(this, new Direction[]{Direction.FORWARD}, start);
         if (oneStep != null) {
+            Log.d(TAG, String.format("Checking forward move to %s", oneStep));
             // Can only move forward if the square is empty
             if (boardMap.get(oneStep) == null) {
+                Log.d(TAG, "Forward square is empty - adding to possible moves");
                 positionSet.add(oneStep);
 
                 // Two steps forward from starting position if path is clear
                 if (isInStartPosition) {
                     Position twoSteps = stepOrNull(this, new Direction[]{Direction.FORWARD, Direction.FORWARD}, start);
                     if (twoSteps != null && boardMap.get(twoSteps) == null) {
+                        Log.d(TAG, String.format("Two-step move possible to %s", twoSteps));
                         positionSet.add(twoSteps);
                     }
                 }
             }
         }
 
-        // Diagonal captures
-        checkDiagonalCapture(boardMap, start, Direction.LEFT, moverCol, positionSet);
-        checkDiagonalCapture(boardMap, start, Direction.RIGHT, moverCol, positionSet);
-
-        return positionSet;
-    }
-
-    /**
-     * Helper method to check diagonal captures
-     */
-    private void checkDiagonalCapture(Map<Position, BasePiece> boardMap, Position start, 
-                                    Direction direction, Colour moverCol, Set<Position> positionSet) {
+        // Check diagonal captures
+        Log.d(TAG, "Checking diagonal captures:");
+        
+        // Left diagonal
         try {
-            // First move forward, then left/right for diagonal
-            Position capturePos = start.neighbour(Direction.FORWARD);
-            if (capturePos != null) {
-                capturePos = capturePos.neighbour(direction);
-                if (capturePos != null) {
-                    BasePiece target = boardMap.get(capturePos);
-                    // Can only capture enemy pieces
-                    if (target != null && target.getColour() != moverCol) {
-                        positionSet.add(capturePos);
-                    }
+            Position leftCapture = stepOrNull(this, new Direction[]{Direction.FORWARD, Direction.LEFT}, start);
+            if (leftCapture != null) {
+                BasePiece leftTarget = boardMap.get(leftCapture);
+                Log.d(TAG, String.format("Left diagonal %s: %s", 
+                    leftCapture,
+                    leftTarget != null ? leftTarget.getColour() + " " + leftTarget.getClass().getSimpleName() : "empty"));
+                if (leftTarget != null && leftTarget.getColour() != moverCol) {
+                    Log.d(TAG, "Can capture left diagonal");
+                    positionSet.add(leftCapture);
                 }
             }
         } catch (Exception e) {
-            // Position is off the board, ignore
+            Log.d(TAG, "Left diagonal is off board");
         }
+
+        // Right diagonal
+        try {
+            Position rightCapture = stepOrNull(this, new Direction[]{Direction.FORWARD, Direction.RIGHT}, start);
+            if (rightCapture != null) {
+                BasePiece rightTarget = boardMap.get(rightCapture);
+                Log.d(TAG, String.format("Right diagonal %s: %s", 
+                    rightCapture,
+                    rightTarget != null ? rightTarget.getColour() + " " + rightTarget.getClass().getSimpleName() : "empty"));
+                if (rightTarget != null && rightTarget.getColour() != moverCol) {
+                    Log.d(TAG, "Can capture right diagonal");
+                    positionSet.add(rightCapture);
+                }
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "Right diagonal is off board");
+        }
+
+        Log.d(TAG, String.format("Final possible moves: %s", positionSet));
+        Log.d(TAG, "=== END PAWN MOVES ===\n");
+        return positionSet;
     }
 
     /**

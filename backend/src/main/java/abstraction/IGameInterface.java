@@ -2,26 +2,23 @@ package abstraction;
 import common.Colour;
 import common.GameState;
 
-import java.util.Map;
-
 public interface IGameInterface {
 
     /**
-     * Get the current board map being used by backend for current game session
-     * @return Board map
-     * */
-    Map<String, String> getBoard();
+     * Get the current game state including the board and other relevant information.
+     * @return GameState containing board layout, possible moves, and eliminated pieces.
+     */
+    GameState getBoard();
 
     /**
-     * Responsible for sending mouse click events to backend and apply game logic over it to display
-     * updated board layout to player.
-     * @param  polygonLabel The unique label of the polygon which is clicked by player
-     * @return GameState which contains current game board layout and list of polygons to highlight
-     **/
-    GameState onClick(String polygonLabel);
+     * Handle a click event on the board.
+     * @param squareLabel The unique label of the square which is clicked by player.
+     * @return Updated GameState after processing the click.
+     */
+    GameState onClick(String squareLabel);
 
     /**
-     * @return returns which colour turn it is currently
-     * */
+     * @return The current player's turn.
+     */
     Colour getTurn();
 }

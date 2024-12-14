@@ -104,25 +104,34 @@ function getColorForDisplay(color) {
 }
 
 // Update the board after a response from the server
-function updateBoard(response) {
-    clearBoard();
-    console.log('New Board Configuration:', response);
+function updateBoard(gameState) {
+    console.log('New GameState:', gameState);
 
-    const board = response['board'];
-    const highlightedPolygons = response['highlightedPolygons'];
-    const winner = response['winner'];
+    const board = gameState['board'];
+    const possibleMoves = gameState['possibleMoves'];
+    const winner = gameState['winner'];
+    const gameOver = gameState['gameOver'];
+    const eliminatedPieces = {
+        white: gameState['eliminatedWhitePieces'],
+        black: gameState['eliminatedBlackPieces']
+    };
 
-    if (response['gameOver']) {
+    if (gameOver) {
         showGameOverPopup(winner);
     }
 
+    clearBoard(); // Clear the board before updating pieces
     if (board) {
         console.log('Updating pieces with board:', board);
         updatePieces(board);
     }
 
-    if (highlightedPolygons) {
-        displayPossibleMoves(highlightedPolygons);
+    if (possibleMoves) {
+        displayPossibleMoves(possibleMoves);
+    }
+
+    if (eliminatedPieces) {
+        updateEliminatedPieces(eliminatedPieces);
     }
 }
 
@@ -138,6 +147,16 @@ function updatePieces(board) {
         console.error('Pieces group not found');
         return;
     }
+    
+    // Create a map of current piece positions
+    const currentPieces = new Map();
+    for (let i = 0; i < piecesGroup.children.length; i++) {
+        const piece = piecesGroup.children[i];
+        const x = piece.getAttribute('x');
+        const y = piece.getAttribute('y');
+        currentPieces.set(`${x}-${y}`, piece);
+    }
+
     piecesGroup.innerHTML = '';
 
     for (const pos in board) {
@@ -169,7 +188,9 @@ function updatePieces(board) {
         const y = row * 60 + 30;  // Center in square
 
         const textElement = getPieceText(x, y, pieceColor, pieceToken);
-        piecesGroup.appendChild(textElement);
+        if (textElement) {
+            piecesGroup.appendChild(textElement);
+        }
     }
 }
 
@@ -240,7 +261,7 @@ function requestUpdatedBoard() {
         try {
             const data = JSON.parse(request.response);
             console.log("Received board data:", data);
-            updateBoard({ board: data });
+            updateBoard(data);
         } catch (e) {
             console.error("Error parsing board data:", e);
         }
@@ -282,5 +303,33 @@ function displayPossibleMoves(highlightedPolygons) {
         if (square) {
             square.setAttribute('fill', 'rgba(255, 255, 0, 0.5)');
         }
+    });
+}
+
+// Add this function to update eliminated pieces
+function updateEliminatedPieces(eliminatedPieces) {
+    const whiteList = document.getElementById('white-eliminated-list');
+    const blackList = document.getElementById('black-eliminated-list');
+    
+    if (!whiteList || !blackList) return;
+    
+    // Clear current lists
+    whiteList.innerHTML = '';
+    blackList.innerHTML = '';
+    
+    // Update white eliminated pieces
+    eliminatedPieces.white.forEach(piece => {
+        const pieceElement = document.createElement('span');
+        pieceElement.className = 'eliminated-piece ' + theme;
+        pieceElement.textContent = pieceMap[piece];
+        whiteList.appendChild(pieceElement);
+    });
+    
+    // Update black eliminated pieces
+    eliminatedPieces.black.forEach(piece => {
+        const pieceElement = document.createElement('span');
+        pieceElement.className = 'eliminated-piece ' + theme;
+        pieceElement.textContent = pieceMap[piece];
+        blackList.appendChild(pieceElement);
     });
 }

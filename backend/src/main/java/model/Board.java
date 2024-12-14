@@ -13,6 +13,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class Board {
 
@@ -23,6 +26,8 @@ public class Board {
     private boolean gameOver;
     private String winner;
     private Set<Position> highlightPolygons = new HashSet<>();
+    private List<BasePiece> eliminatedWhitePieces = new ArrayList<>();
+    private List<BasePiece> eliminatedBlackPieces = new ArrayList<>();
 
     public Board() {
         boardMap = new HashMap<>();
@@ -76,29 +81,75 @@ public class Board {
     }
 
     public void move(Position start, Position end) throws InvalidMoveException, InvalidPositionException {
-        Log.d(TAG, String.format("Attempting move from %s to %s", start, end));
+        Log.d(TAG, "\n=== MOVE ATTEMPT ===");
+        Log.d(TAG, String.format("Start position: %s (row: %d, col: %d)", start, start.getRow(), start.getColumn()));
+        Log.d(TAG, String.format("End position: %s (row: %d, col: %d)", end, end.getRow(), end.getColumn()));
+
         BasePiece mover = boardMap.get(start);
         if (mover == null) {
+            Log.e(TAG, "ERROR: No piece at start position");
             throw new InvalidMoveException("No piece at start position");
         }
-        Log.d(TAG, String.format("Moving piece %s of color %s", mover.getClass().getSimpleName(), mover.getColour()));
+
+        // Log the current board state
+        Log.d(TAG, "\nCurrent board state:");
+        for (Map.Entry<Position, BasePiece> entry : boardMap.entrySet()) {
+            Log.d(TAG, String.format("Position %s: %s %s", 
+                entry.getKey(), entry.getValue().getColour(), entry.getValue().getClass().getSimpleName()));
+        }
+
+        // Check if there's a piece at the target position
+        Position targetPos = Position.get(end.getColour() == mover.getColour() ? 
+            (mover.getColour() == Colour.WHITE ? Colour.BLACK : Colour.WHITE) : end.getColour(), 
+            end.getRow(), end.getColumn());
+        BasePiece targetPiece = boardMap.get(targetPos);
+        
+        if (targetPiece != null) {
+            Log.d(TAG, String.format("Target square contains: %s %s", 
+                targetPiece.getColour(), targetPiece.getClass().getSimpleName()));
+        } else {
+            Log.d(TAG, "Target square is empty");
+        }
+
+        Log.d(TAG, String.format("Moving piece: %s, Color: %s, Current turn: %s", 
+            mover.getClass().getSimpleName(), mover.getColour(), turn));
 
         if (isLegalMove(start, end)) {
-            // Check if there's a piece to capture at the end position
-            BasePiece capturedPiece = boardMap.get(end);
-            if (capturedPiece != null) {
-                Log.d(TAG, String.format("Capturing piece %s of color %s", 
-                    capturedPiece.getClass().getSimpleName(), capturedPiece.getColour()));
+            // If there's a piece at the target position, it will be captured
+            if (targetPiece != null) {
+                Log.d(TAG, String.format("Capturing piece %s %s at %s", 
+                    targetPiece.getColour(), targetPiece.getClass().getSimpleName(), targetPos));
+                
+                // Add captured piece to eliminated pieces list
+                if (targetPiece.getColour() == Colour.WHITE) {
+                    eliminatedWhitePieces.add(targetPiece);
+                } else {
+                    eliminatedBlackPieces.add(targetPiece);
+                }
+                // Remove captured piece from board
+                boardMap.remove(targetPos);
+                Log.d(TAG, String.format("Removed captured piece from %s", targetPos));
             }
 
             // Remove piece from start position
             boardMap.remove(start);
-            
-            // Place piece at end position (this will automatically remove any captured piece)
+            Log.d(TAG, String.format("Removed piece from %s", start));
+
+            // Place piece at end position
+            Position finalPos = Position.get(mover.getColour(), end.getRow(), end.getColumn());
             if (mover instanceof Pawn && end.getRow() == (mover.getColour() == Colour.WHITE ? 0 : 7)) {
-                boardMap.put(end, new Queen(mover.getColour()));
+                boardMap.put(finalPos, new Queen(mover.getColour()));
+                Log.d(TAG, "Pawn promoted to Queen");
             } else {
-                boardMap.put(end, mover);
+                boardMap.put(finalPos, mover);
+                Log.d(TAG, String.format("Placed %s at %s", mover.getClass().getSimpleName(), finalPos));
+            }
+
+            // Log the new board state
+            Log.d(TAG, "\nNew board state:");
+            for (Map.Entry<Position, BasePiece> entry : boardMap.entrySet()) {
+                Log.d(TAG, String.format("Position %s: %s %s", 
+                    entry.getKey(), entry.getValue().getColour(), entry.getValue().getClass().getSimpleName()));
             }
 
             // Handle castling
@@ -107,10 +158,12 @@ public class Board {
                     Position rookPos = Position.get(mover.getColour(), start.getRow(), 0);
                     boardMap.put(Position.get(mover.getColour(), start.getRow(), 3), boardMap.get(rookPos));
                     boardMap.remove(rookPos);
+                    Log.d(TAG, "Kingside castling performed");
                 } else if (end.getColumn() == 6) {
                     Position rookPos = Position.get(mover.getColour(), start.getRow(), 7);
                     boardMap.put(Position.get(mover.getColour(), start.getRow(), 5), boardMap.get(rookPos));
                     boardMap.remove(rookPos);
+                    Log.d(TAG, "Queenside castling performed");
                 }
             }
 
@@ -119,12 +172,22 @@ public class Board {
             if (isCheckMate(nextTurn, boardMap)) {
                 gameOver = true;
                 winner = mover.getColour().toString();
+                Log.d(TAG, String.format("Checkmate! Winner: %s", winner));
             }
 
             // Update turn
             turn = nextTurn;
-            Log.d(TAG, String.format("Move completed. New turn: %s", turn));
+            Log.d(TAG, String.format("Turn updated to: %s", turn));
+            Log.d(TAG, "=== MOVE COMPLETED ===\n");
         } else {
+            Log.e(TAG, "\nILLEGAL MOVE DETAILS:");
+            Log.e(TAG, String.format("- Piece: %s", mover.getClass().getSimpleName()));
+            Log.e(TAG, String.format("- Color: %s", mover.getColour()));
+            Log.e(TAG, String.format("- Current turn: %s", turn));
+            Log.e(TAG, String.format("- Start: %s", start));
+            Log.e(TAG, String.format("- End: %s", end));
+            Set<Position> possibleMoves = mover.getPossibleMoves(this.boardMap, start);
+            Log.e(TAG, String.format("- Possible moves: %s", possibleMoves));
             throw new InvalidMoveException(String.format("Illegal Move: %s-%s for piece %s", start, end, mover.getClass().getSimpleName()));
         }
     }
@@ -137,22 +200,44 @@ public class Board {
             return false;
         }
 
-        Set<Position> possibleMoves = mover.getPossibleMoves(this.boardMap, start);
-        if (!possibleMoves.contains(end)) {
-            Log.d(TAG, String.format("Illegal move: end position %s not in possible moves for piece at %s", end, start));
+        try {
+            // Get target piece from both color spaces
+            Position targetPos = Position.get(end.getColour() == mover.getColour() ? 
+                (mover.getColour() == Colour.WHITE ? Colour.BLACK : Colour.WHITE) : end.getColour(), 
+                end.getRow(), end.getColumn());
+            BasePiece targetPiece = boardMap.get(targetPos);
+            
+            // Check if target piece exists and is of the same color
+            if (targetPiece != null && targetPiece.getColour() == mover.getColour()) {
+                Log.d(TAG, String.format("Illegal move: cannot capture own piece at %s", targetPos));
+                return false;
+            }
+
+            Set<Position> possibleMoves = mover.getPossibleMoves(this.boardMap, start);
+            if (!possibleMoves.contains(end)) {
+                Log.d(TAG, String.format("Illegal move: end position %s not in possible moves for piece at %s", end, start));
+                return false;
+            }
+
+            // Check if move would put/leave king in check
+            Map<Position, BasePiece> testBoardMap = new HashMap<>(boardMap);
+            testBoardMap.remove(start);
+            if (targetPiece != null) {
+                testBoardMap.remove(targetPos);
+            }
+            Position finalPos = Position.get(mover.getColour(), end.getRow(), end.getColumn());
+            testBoardMap.put(finalPos, mover);
+
+            if (isCheck(turn, testBoardMap)) {
+                Log.d(TAG, String.format("Illegal move: piece at %s to %s would put/leave king in check", start, end));
+                return false;
+            }
+
+            return true;
+        } catch (InvalidPositionException e) {
+            Log.e(TAG, "Invalid position in isLegalMove: " + e.getMessage());
             return false;
         }
-
-        // Check if move would put/leave king in check
-        if (isCheck(turn, boardMap) && isCheckAfterLegalMove(turn, boardMap, start, end)) {
-            Log.d(TAG, String.format("Illegal move: piece at %s to %s would leave king in check", start, end));
-            return false;
-        } else if (isCheckAfterLegalMove(turn, boardMap, start, end)) {
-            Log.d(TAG, String.format("Illegal move: piece at %s to %s would put king in check", start, end));
-            return false;
-        }
-
-        return true;
     }
 
     public Colour getTurn() {
@@ -177,8 +262,29 @@ public class Board {
         Colour moverColour = mover.getColour();
         Set<Position> nonCheckPositions = new HashSet<>();
         for (Position endPos : highlightPolygons) {
-            if (!isCheckAfterLegalMove(moverColour, this.boardMap, position, endPos)) {
-                nonCheckPositions.add(endPos);
+            try {
+                // Get target piece from both color spaces
+                Position targetPos = Position.get(endPos.getColour() == moverColour ? 
+                    (moverColour == Colour.WHITE ? Colour.BLACK : Colour.WHITE) : endPos.getColour(), 
+                    endPos.getRow(), endPos.getColumn());
+                BasePiece targetPiece = boardMap.get(targetPos);
+
+                // Create test board state
+                Map<Position, BasePiece> testBoardMap = new HashMap<>(boardMap);
+                testBoardMap.remove(position);
+                if (targetPiece != null) {
+                    testBoardMap.remove(targetPos);
+                }
+                Position finalPos = Position.get(moverColour, endPos.getRow(), endPos.getColumn());
+                testBoardMap.put(finalPos, mover);
+
+                if (!isCheck(moverColour, testBoardMap)) {
+                    nonCheckPositions.add(endPos);
+                }
+            } catch (InvalidPositionException e) {
+                Log.e(TAG, "Invalid position in getPossibleMoves: " + e.getMessage());
+                // Skip this position if it's invalid
+                continue;
             }
         }
 
@@ -227,12 +333,27 @@ public class Board {
     }
 
     private boolean isCheckAfterLegalMove(Colour colour, Map<Position, BasePiece> boardMap, Position start, Position end) {
-        Map<Position, BasePiece> copyBoardMap = new HashMap<>(boardMap);
-        BasePiece piece = copyBoardMap.get(start);
-        copyBoardMap.remove(start);
-        copyBoardMap.put(end, piece);
+        try {
+            BasePiece mover = boardMap.get(start);
+            Position targetPos = Position.get(end.getColour() == mover.getColour() ? 
+                (mover.getColour() == Colour.WHITE ? Colour.BLACK : Colour.WHITE) : end.getColour(), 
+                end.getRow(), end.getColumn());
+            BasePiece targetPiece = boardMap.get(targetPos);
 
-        return isCheck(colour, copyBoardMap);
+            Map<Position, BasePiece> testBoardMap = new HashMap<>(boardMap);
+            testBoardMap.remove(start);
+            if (targetPiece != null) {
+                testBoardMap.remove(targetPos);
+            }
+            Position finalPos = Position.get(mover.getColour(), end.getRow(), end.getColumn());
+            testBoardMap.put(finalPos, mover);
+
+            return isCheck(colour, testBoardMap);
+        } catch (InvalidPositionException e) {
+            Log.e(TAG, "Invalid position in isCheckAfterLegalMove: " + e.getMessage());
+            // If we can't validate the move properly, assume it would result in check
+            return true;
+        }
     }
 
     private Position getKingPosition(Colour colour, Map<Position, BasePiece> boardMap) {
@@ -243,5 +364,26 @@ public class Board {
             }
         }
         return null;
+    }
+
+    public Map<String, List<String>> getEliminatedPieces() {
+        Map<String, List<String>> eliminatedPieces = new HashMap<>();
+        
+        List<String> whitePieces = eliminatedWhitePieces.stream()
+            .map(BasePiece::toString)
+            .collect(Collectors.toList());
+        
+        List<String> blackPieces = eliminatedBlackPieces.stream()
+            .map(BasePiece::toString)
+            .collect(Collectors.toList());
+        
+        eliminatedPieces.put("white", whitePieces);
+        eliminatedPieces.put("black", blackPieces);
+        
+        return eliminatedPieces;
+    }
+
+    public Map<Position, BasePiece> getBoardMap() {
+        return boardMap;
     }
 }

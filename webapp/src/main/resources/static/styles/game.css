@@ -114,3 +114,27 @@ text {
 .black {
     background-color: #b58863;
 }
+
+.eliminated-pieces {
+    margin-top: 20px;
+    padding: 10px;
+}
+
+.white-eliminated, .black-eliminated {
+    margin-bottom: 20px;
+}
+
+.eliminated-piece {
+    display: inline-block;
+    font-size: 24px;
+    margin: 2px;
+}
+
+.white-eliminated .eliminated-piece {
+    color: #FFFFFF;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+.black-eliminated .eliminated-piece {
+    color: #000000;
+}

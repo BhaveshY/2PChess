@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
 
 import static common.Position.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -110,5 +111,29 @@ class BoardTest {
         boardMap.remove(E3R);
         Set<Position> possibleMoves = board.getPossibleMoves(E2R);
         assertFalse(possibleMoves.isEmpty());
+    }
+
+    @Test
+    void move_capturePiece_targetPieceRemovedFromBoard() throws InvalidMoveException, InvalidPositionException {
+        // Setup: Place a white pawn and a black pawn in adjacent positions
+        BasePiece whitePawn = new Pawn(Colour.WHITE);
+        BasePiece blackPawn = new Pawn(Colour.BLACK);
+        Position whitePawnPos = Position.get(Colour.WHITE, 4, 4);
+        Position blackPawnPos = Position.get(Colour.BLACK, 5, 5);
+        boardMap.put(whitePawnPos, whitePawn);
+        boardMap.put(blackPawnPos, blackPawn);
+
+        // Move the white pawn to capture the black pawn
+        board.move(whitePawnPos, blackPawnPos);
+
+        // Assert that the black pawn is no longer on the board
+        assertNull(boardMap.get(blackPawnPos));
+        // Assert that the white pawn is now at the new position
+        assertNotNull(boardMap.get(blackPawnPos));
+        assertTrue(boardMap.get(blackPawnPos) instanceof Pawn);
+        assertEquals(Colour.WHITE, boardMap.get(blackPawnPos).getColour());
+        // Assert that the black pawn is in the eliminated pieces list
+        Map<String, List<String>> eliminatedPieces = board.getEliminatedPieces();
+        assertTrue(eliminatedPieces.get("black").stream().anyMatch(piece -> piece.contains("Pawn")));
     }
 }

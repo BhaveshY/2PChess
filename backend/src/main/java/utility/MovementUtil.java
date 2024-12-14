@@ -11,8 +11,6 @@ import model.BasePiece;
  **/
 public class MovementUtil {
 
-    private static final String TAG = "MovementUtil";
-
     /**
      * step method to get the next position based on the direction input
      * @param piece piece to be moved

@@ -111,6 +111,7 @@ public enum Position {
         break;
     }
 
+    // Always use the same color space as the moving piece
     return Position.get(this.colour, newRow, newColumn);
   }
 }

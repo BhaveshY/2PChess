@@ -18,7 +18,7 @@ import java.util.Set;
 
 /**
  * Class containing the main logic of the backend.
- * the click inputs from the webapp is communicated with the backend.
+ * The click inputs from the webapp are communicated with the backend.
  */
 public class GameMain implements IGameInterface {
 
@@ -29,7 +29,7 @@ public class GameMain implements IGameInterface {
 
     /**
      * GameMain Constructor. Entry point to the backend logic
-     * */
+     */
     public GameMain() {
         Log.d(TAG, "initGame GameMain()");
         board = new Board();
@@ -38,12 +38,12 @@ public class GameMain implements IGameInterface {
     }
 
     /**
-     * Get the current board map being used by backend for current game session
-     * @return Board map
-     * */
+     * Get the current game state including the board and other relevant information.
+     * @return GameState containing board layout, possible moves, and eliminated pieces.
+     */
     @Override
-    public Map<String, String> getBoard() {
-        return board.getWebViewBoard();
+    public GameState getBoard() {
+        return BoardAdapter.convertModelBoardToGameState(board);
     }
 
     /**
@@ -104,7 +104,23 @@ public class GameMain implements IGameInterface {
                 // Use the same color for end position as the piece we found
                 Position endPosition;
                 try {
+                    // First try the same color space as the moving piece
                     endPosition = Position.get(piece.getColour(), endRow, endCol);
+                    BasePiece targetPiece = board.getPiece(endPosition);
+                    
+                    // If there's no piece in our color space, or if there is one but it's our own piece,
+                    // check the opposite color space for a potential capture
+                    if (targetPiece == null || targetPiece.getColour() == piece.getColour()) {
+                        Position oppositeEndPosition = Position.get(
+                            piece.getColour() == Colour.WHITE ? Colour.BLACK : Colour.WHITE,
+                            endRow, endCol);
+                        BasePiece oppositeTargetPiece = board.getPiece(oppositeEndPosition);
+                        
+                        // If there's an opponent's piece in the opposite color space, use that position
+                        if (oppositeTargetPiece != null && oppositeTargetPiece.getColour() != piece.getColour()) {
+                            endPosition = oppositeEndPosition;
+                        }
+                    }
                 } catch (InvalidPositionException e) {
                     throw new InvalidMoveException("Invalid end position");
                 }
@@ -151,7 +167,7 @@ public class GameMain implements IGameInterface {
                             position = Position.get(Colour.WHITE, row, col);
                         } catch (InvalidPositionException e3) {
                             Log.e(TAG, "Could not create valid position");
-                            return new GameState(getBoard(), List.of());
+                            return BoardAdapter.convertModelBoardToGameState(board);
                         }
                     }
                 }
@@ -179,22 +195,17 @@ public class GameMain implements IGameInterface {
             Log.e(TAG, "InvalidMoveException onClick: " + e.getMessage());
             moveStartPos = null;
             highlightSquares = ImmutableSet.of();
+            return BoardAdapter.convertModelBoardToGameState(board);
         }
         
-        List<String> highlightSquaresList = BoardAdapter.convertHighlightSquaresToViewBoard(highlightSquares);
-        GameState clickResponse = new GameState(getBoard(), highlightSquaresList);
-        if (board.isGameOver()) {
-            String winner = board.getWinner();
-            Log.d(TAG, "Winner: " + winner);
-            clickResponse.setGameOver(winner);
-        }
-        Log.d(TAG, "ClickResponse: " + clickResponse);
-        return clickResponse;
+        // Convert the current board state to GameState
+        GameState gameState = BoardAdapter.convertModelBoardToGameState(board);
+        return gameState;
     }
 
     /**
      * @return returns which colour turn it is currently
-     * */
+     */
     @Override
     public Colour getTurn() {
         return board.getTurn();
