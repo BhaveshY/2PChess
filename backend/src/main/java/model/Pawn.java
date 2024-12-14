@@ -2,7 +2,6 @@ package model;
 
 import common.Colour;
 import common.Direction;
-import common.InvalidPositionException;
 import common.Position;
 import utility.Log;
 
@@ -53,30 +52,43 @@ public class Pawn extends BasePiece {
     @Override
     public Set<Position> getPossibleMoves(Map<Position, BasePiece> boardMap, Position start) {
         Set<Position> positionSet = new HashSet<>();
-        BasePiece mover = this;
-        Colour moverCol = mover.getColour();
+        Colour moverCol = this.getColour();
         Direction[][] steps = this.directions;
+
+        // Check if pawn is in starting position
+        boolean isInStartPosition = (moverCol == Colour.WHITE && start.getRow() == 6) || 
+                                  (moverCol == Colour.BLACK && start.getRow() == 1);
 
         for (int i = 0; i < steps.length; i++) {
             Direction[] step = steps[i];
-            Position end = stepOrNull(mover, step, start);
+            Position end = stepOrNull(this, step, start);
 
             if (end != null && !positionSet.contains(end)) {
                 BasePiece target = boardMap.get(end);
-                Log.d(TAG, "end: " + end + ", step: " + Arrays.toString(step));
-                try {
-                    boolean isOneStepForwardAndNotTakingPieceCase = (target == null && i == 0); // 1 step forward, not taking
-                    boolean isTwoStepForwardAndNotTakingPieceCase = (target == null && i == 1 // 2 steps forward,
-                            && start.getColour() == moverCol && start.getRow() == 1 // must be in initial position
-                            && boardMap.get(Position.get(moverCol, 2, start.getColumn())) == null); // and can't jump a piece;
-                    boolean isDiagonalMoveAndTakingPieceCase = (target != null && target.getColour() != moverCol && i > 1); // or taking diagonally
+                Log.d(TAG, String.format("Checking move from %s to %s (step: %s)", start, end, Arrays.toString(step)));
 
-                    if (isOneStepForwardAndNotTakingPieceCase || isTwoStepForwardAndNotTakingPieceCase || isDiagonalMoveAndTakingPieceCase) {
-                        Log.d(TAG, "position: " + end);
+                try {
+                    // One step forward - only if square is empty
+                    boolean isOneStepForward = (i == 0 && target == null);
+
+                    // Two steps forward - only from starting position and if both squares are empty
+                    boolean isTwoStepsForward = false;
+                    if (i == 1 && isInStartPosition && target == null) {
+                        Position intermediatePos = stepOrNull(this, new Direction[]{Direction.FORWARD}, start);
+                        isTwoStepsForward = intermediatePos != null && boardMap.get(intermediatePos) == null;
+                    }
+
+                    // Diagonal capture - only if there's an enemy piece
+                    boolean isDiagonalCapture = (i > 1 && target != null && target.getColour() != moverCol);
+
+                    if (isOneStepForward || isTwoStepsForward || isDiagonalCapture) {
+                        Log.d(TAG, String.format("Valid move to %s (type: %s)", end, 
+                            isOneStepForward ? "one step" : 
+                            isTwoStepsForward ? "two steps" : "capture"));
                         positionSet.add(end);
                     }
-                } catch (InvalidPositionException e) {
-                    Log.d(TAG, "InvalidPositionException: " + e.getMessage());
+                } catch (Exception e) {
+                    Log.d(TAG, "Error checking move: " + e.getMessage());
                 }
             }
         }

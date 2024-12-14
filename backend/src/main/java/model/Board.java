@@ -38,8 +38,10 @@ public class Board {
     }
 
     private void placeChessPieces(Colour colour) throws InvalidPositionException {
-        int pawnRow = colour == Colour.WHITE ? 1 : 6;
-        int mainRow = colour == Colour.WHITE ? 0 : 7;
+        // White pieces start on rows 6-7 (bottom)
+        // Black pieces start on rows 0-1 (top)
+        int pawnRow = colour == Colour.WHITE ? 6 : 1;
+        int mainRow = colour == Colour.WHITE ? 7 : 0;
 
         // place ROOK
         boardMap.put(Position.get(colour, mainRow, 0), PieceFactory.createPiece("Rook", colour));
@@ -74,17 +76,26 @@ public class Board {
     }
 
     public void move(Position start, Position end) throws InvalidMoveException, InvalidPositionException {
+        Log.d(TAG, String.format("Attempting move from %s to %s", start, end));
+        BasePiece mover = boardMap.get(start);
+        if (mover == null) {
+            throw new InvalidMoveException("No piece at start position");
+        }
+        Log.d(TAG, String.format("Moving piece %s of color %s", mover.getClass().getSimpleName(), mover.getColour()));
+
         if (isLegalMove(start, end)) {
-            BasePiece mover = boardMap.get(start);
+            // Remove piece from start position
             boardMap.remove(start);
 
-            if (mover instanceof Pawn && end.getRow() == (mover.getColour() == Colour.WHITE ? 7 : 0)) {
+            // Handle pawn promotion
+            if (mover instanceof Pawn && end.getRow() == (mover.getColour() == Colour.WHITE ? 0 : 7)) {
                 boardMap.put(end, new Queen(mover.getColour()));
             } else {
                 boardMap.put(end, mover);
             }
 
-            if (mover instanceof King && start.getColumn() == 4 && start.getRow() == (mover.getColour() == Colour.WHITE ? 0 : 7)) {
+            // Handle castling
+            if (mover instanceof King && start.getColumn() == 4) {
                 if (end.getColumn() == 2) {
                     Position rookPos = Position.get(mover.getColour(), start.getRow(), 0);
                     boardMap.put(Position.get(mover.getColour(), start.getRow(), 3), boardMap.get(rookPos));
@@ -96,45 +107,52 @@ public class Board {
                 }
             }
 
-            if (isCheckMate(turn.next(), boardMap)) {
+            // Check for checkmate
+            Colour nextTurn = turn.next();
+            if (isCheckMate(nextTurn, boardMap)) {
                 gameOver = true;
                 winner = mover.getColour().toString();
             }
 
-            turn = turn.next();
+            // Update turn
+            turn = nextTurn;
+            Log.d(TAG, String.format("Move completed. New turn: %s", turn));
         } else {
-            throw new InvalidMoveException("Illegal Move: " + start + "-" + end);
+            throw new InvalidMoveException(String.format("Illegal Move: %s-%s for piece %s", start, end, mover.getClass().getSimpleName()));
         }
     }
 
     public boolean isLegalMove(Position start, Position end) {
         BasePiece mover = getPiece(start);
-        if (mover == null) {
+        if (mover == null || mover.getColour() != turn) {
+            Log.d(TAG, String.format("Illegal move: piece is null or wrong color. Piece: %s, Turn: %s", 
+                mover != null ? mover.getColour() : "null", turn));
             return false;
         }
-        Colour moverCol = mover.getColour();
-        if (highlightPolygons.isEmpty()) {
-            highlightPolygons = mover.getPossibleMoves(this.boardMap, start);
+
+        Set<Position> possibleMoves = mover.getPossibleMoves(this.boardMap, start);
+        if (!possibleMoves.contains(end)) {
+            Log.d(TAG, String.format("Illegal move: end position %s not in possible moves for piece at %s", end, start));
+            return false;
         }
-        if (highlightPolygons.contains(end)) {
-            if (isCheck(turn, boardMap) && isCheckAfterLegalMove(turn, boardMap, start, end)) {
-                Log.d(TAG, "Colour " + moverCol + " is in check, this move doesn't help. Do again!!");
-                return false;
-            } else if (isCheckAfterLegalMove(turn, boardMap, start, end)) {
-                Log.d(TAG, "Colour " + moverCol + " will be in check after this move");
-                return false;
-            } else {
-                return true;
-            }
+
+        // Check if move would put/leave king in check
+        if (isCheck(turn, boardMap) && isCheckAfterLegalMove(turn, boardMap, start, end)) {
+            Log.d(TAG, String.format("Illegal move: piece at %s to %s would leave king in check", start, end));
+            return false;
+        } else if (isCheckAfterLegalMove(turn, boardMap, start, end)) {
+            Log.d(TAG, String.format("Illegal move: piece at %s to %s would put king in check", start, end));
+            return false;
         }
-        return false;
+
+        return true;
     }
 
     public Colour getTurn() {
         return turn;
     }
 
-    private BasePiece getPiece(Position position) {
+    public BasePiece getPiece(Position position) {
         return boardMap.get(position);
     }
 

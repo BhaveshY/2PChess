@@ -22,21 +22,8 @@ public class MovementUtil {
      * @return Position of the piece after the step
      **/
     public static Position step(BasePiece piece, Direction[] step, Position current) throws InvalidPositionException {
-        boolean reverse = false;
-        for(Direction d: step){
-            if((piece.getColour()!=current.getColour() && piece instanceof Pawn) || reverse){//reverse directions for knights
-                switch(d){
-                    case FORWARD: d = Direction.BACKWARD; break;
-                    case BACKWARD: d = Direction.FORWARD; break;
-                    case LEFT: d = Direction.RIGHT; break;
-                    case RIGHT: d = Direction.LEFT; break;
-                }
-            }
-            Position next = current.neighbour(d);
-            if(next.getColour()!= current.getColour()){//need to reverse directions when switching between sections of the board
-                reverse=true;
-            }
-            current = next;
+        for(Direction d: step) {
+            current = current.neighbour(d);
         }
         return current;
     }
@@ -50,20 +37,8 @@ public class MovementUtil {
      * @return Position of the piece after the step
      **/
     public static Position step(BasePiece piece, Direction[] step, Position current, boolean reverse) throws InvalidPositionException {
-        for(Direction d: step){
-            if((piece.getColour()!=current.getColour() && piece instanceof Pawn) || reverse){//reverse directions for knights
-                switch(d){
-                    case FORWARD: d = Direction.BACKWARD; break;
-                    case BACKWARD: d = Direction.FORWARD; break;
-                    case LEFT: d = Direction.RIGHT; break;
-                    case RIGHT: d = Direction.LEFT; break;
-                }
-            }
-            Position next = current.neighbour(d);
-            if(next.getColour()!= current.getColour()){//need to reverse directions when switching between sections of the board
-                reverse=true;
-            }
-            current = next;
+        for(Direction d: step) {
+            current = current.neighbour(d);
         }
         return current;
     }

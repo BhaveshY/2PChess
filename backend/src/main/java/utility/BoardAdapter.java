@@ -27,7 +27,7 @@ public class BoardAdapter {
         for(Position position: modelBoard.keySet()) {
             BasePiece piece = modelBoard.get(position);
             if(piece != null) {
-                viewBoard.put(position.toString(), piece.toString());
+                viewBoard.put(position.toString().substring(1), piece.toString());
             }
         }
 

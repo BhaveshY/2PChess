@@ -24,22 +24,22 @@ public enum Position {
   H5R(Colour.WHITE, 4, 7), H6R(Colour.WHITE, 5, 7), H7R(Colour.WHITE, 6, 7), H8R(Colour.WHITE, 7, 7),
 
   // BLACK section positions (top)
-  A8B(Colour.BLACK, 0, 0), A7B(Colour.BLACK, 1, 0), A6B(Colour.BLACK, 2, 0), A5B(Colour.BLACK, 3, 0),
-  A4B(Colour.BLACK, 4, 0), A3B(Colour.BLACK, 5, 0), A2B(Colour.BLACK, 6, 0), A1B(Colour.BLACK, 7, 0),
-  B8B(Colour.BLACK, 0, 1), B7B(Colour.BLACK, 1, 1), B6B(Colour.BLACK, 2, 1), B5B(Colour.BLACK, 3, 1),
-  B4B(Colour.BLACK, 4, 1), B3B(Colour.BLACK, 5, 1), B2B(Colour.BLACK, 6, 1), B1B(Colour.BLACK, 7, 1),
-  C8B(Colour.BLACK, 0, 2), C7B(Colour.BLACK, 1, 2), C6B(Colour.BLACK, 2, 2), C5B(Colour.BLACK, 3, 2),
-  C4B(Colour.BLACK, 4, 2), C3B(Colour.BLACK, 5, 2), C2B(Colour.BLACK, 6, 2), C1B(Colour.BLACK, 7, 2),
-  D8B(Colour.BLACK, 0, 3), D7B(Colour.BLACK, 1, 3), D6B(Colour.BLACK, 2, 3), D5B(Colour.BLACK, 3, 3),
-  D4B(Colour.BLACK, 4, 3), D3B(Colour.BLACK, 5, 3), D2B(Colour.BLACK, 6, 3), D1B(Colour.BLACK, 7, 3),
-  E8B(Colour.BLACK, 0, 4), E7B(Colour.BLACK, 1, 4), E6B(Colour.BLACK, 2, 4), E5B(Colour.BLACK, 3, 4),
-  E4B(Colour.BLACK, 4, 4), E3B(Colour.BLACK, 5, 4), E2B(Colour.BLACK, 6, 4), E1B(Colour.BLACK, 7, 4),
-  F8B(Colour.BLACK, 0, 5), F7B(Colour.BLACK, 1, 5), F6B(Colour.BLACK, 2, 5), F5B(Colour.BLACK, 3, 5),
-  F4B(Colour.BLACK, 4, 5), F3B(Colour.BLACK, 5, 5), F2B(Colour.BLACK, 6, 5), F1B(Colour.BLACK, 7, 5),
-  G8B(Colour.BLACK, 0, 6), G7B(Colour.BLACK, 1, 6), G6B(Colour.BLACK, 2, 6), G5B(Colour.BLACK, 3, 6),
-  G4B(Colour.BLACK, 4, 6), G3B(Colour.BLACK, 5, 6), G2B(Colour.BLACK, 6, 6), G1B(Colour.BLACK, 7, 6),
-  H8B(Colour.BLACK, 0, 7), H7B(Colour.BLACK, 1, 7), H6B(Colour.BLACK, 2, 7), H5B(Colour.BLACK, 3, 7),
-  H4B(Colour.BLACK, 4, 7), H3B(Colour.BLACK, 5, 7), H2B(Colour.BLACK, 6, 7), H1B(Colour.BLACK, 7, 7);
+  A8B(Colour.BLACK, 7, 0), A7B(Colour.BLACK, 6, 0), A6B(Colour.BLACK, 5, 0), A5B(Colour.BLACK, 4, 0),
+  A4B(Colour.BLACK, 3, 0), A3B(Colour.BLACK, 2, 0), A2B(Colour.BLACK, 1, 0), A1B(Colour.BLACK, 0, 0),
+  B8B(Colour.BLACK, 7, 1), B7B(Colour.BLACK, 6, 1), B6B(Colour.BLACK, 5, 1), B5B(Colour.BLACK, 4, 1),
+  B4B(Colour.BLACK, 3, 1), B3B(Colour.BLACK, 2, 1), B2B(Colour.BLACK, 1, 1), B1B(Colour.BLACK, 0, 1),
+  C8B(Colour.BLACK, 7, 2), C7B(Colour.BLACK, 6, 2), C6B(Colour.BLACK, 5, 2), C5B(Colour.BLACK, 4, 2),
+  C4B(Colour.BLACK, 3, 2), C3B(Colour.BLACK, 2, 2), C2B(Colour.BLACK, 1, 2), C1B(Colour.BLACK, 0, 2),
+  D8B(Colour.BLACK, 7, 3), D7B(Colour.BLACK, 6, 3), D6B(Colour.BLACK, 5, 3), D5B(Colour.BLACK, 4, 3),
+  D4B(Colour.BLACK, 3, 3), D3B(Colour.BLACK, 2, 3), D2B(Colour.BLACK, 1, 3), D1B(Colour.BLACK, 0, 3),
+  E8B(Colour.BLACK, 7, 4), E7B(Colour.BLACK, 6, 4), E6B(Colour.BLACK, 5, 4), E5B(Colour.BLACK, 4, 4),
+  E4B(Colour.BLACK, 3, 4), E3B(Colour.BLACK, 2, 4), E2B(Colour.BLACK, 1, 4), E1B(Colour.BLACK, 0, 4),
+  F8B(Colour.BLACK, 7, 5), F7B(Colour.BLACK, 6, 5), F6B(Colour.BLACK, 5, 5), F5B(Colour.BLACK, 4, 5),
+  F4B(Colour.BLACK, 3, 5), F3B(Colour.BLACK, 2, 5), F2B(Colour.BLACK, 1, 5), F1B(Colour.BLACK, 0, 5),
+  G8B(Colour.BLACK, 7, 6), G7B(Colour.BLACK, 6, 6), G6B(Colour.BLACK, 5, 6), G5B(Colour.BLACK, 4, 6),
+  G4B(Colour.BLACK, 3, 6), G3B(Colour.BLACK, 2, 6), G2B(Colour.BLACK, 1, 6), G1B(Colour.BLACK, 0, 6),
+  H8B(Colour.BLACK, 7, 7), H7B(Colour.BLACK, 6, 7), H6B(Colour.BLACK, 5, 7), H5B(Colour.BLACK, 4, 7),
+  H4B(Colour.BLACK, 3, 7), H3B(Colour.BLACK, 2, 7), H2B(Colour.BLACK, 1, 7), H1B(Colour.BLACK, 0, 7);
 
   private final Colour colour;
   private final int row;
@@ -74,7 +74,7 @@ public enum Position {
         return position;
       }
     }
-    throw new InvalidPositionException("No such position.");
+    throw new InvalidPositionException(String.format("No such position: colour=%s, row=%d, column=%d", colour, row, column));
   }
 
   private char getColumnChar(int column) {
@@ -97,16 +97,16 @@ public enum Position {
 
     switch (direction) {
       case FORWARD:
-        newRow--;
+        newRow++;  // Moving forward increases row (moves up the board)
         break;
       case BACKWARD:
-        newRow++;
+        newRow--;  // Moving backward decreases row (moves down the board)
         break;
       case LEFT:
-        newColumn--;
+        newColumn--;  // Moving left decreases column
         break;
       case RIGHT:
-        newColumn++;
+        newColumn++;  // Moving right increases column
         break;
     }
 

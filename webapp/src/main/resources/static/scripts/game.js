@@ -34,11 +34,11 @@ function renderBoard() {
     boardGroup.innerHTML = ''; // Clear existing squares
 
     // Create squares
-    for (let row = 0; row < 8; row++) {
+    for (let row = 7; row >= 0; row--) {
         for (let col = 0; col < 8; col++) {
             const square = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             square.setAttribute('x', col * 60);  // Reduced size
-            square.setAttribute('y', row * 60);  // Reduced size
+            square.setAttribute('y', (7 - row) * 60);  // Reduced size
             square.setAttribute('width', 60);    // Reduced size
             square.setAttribute('height', 60);   // Reduced size
             square.setAttribute('fill', (row + col) % 2 === 0 ? '#f0d9b5' : '#b58863');
@@ -57,7 +57,8 @@ function handleSquareClick(squareId) {
         highlightSquare(squareId, 'rgba(0, 255, 0, 0.3)'); // Green highlight for selected square
     } else {
         // Second click - attempt to move
-        sendPolygonClicked(selectedSquare + squareId);
+        const moveCommand = `${selectedSquare}-${squareId}`; // Add separator between positions
+        sendPolygonClicked(moveCommand);
         unhighlightSquare(selectedSquare);
         selectedSquare = null;
     }
@@ -127,13 +128,7 @@ function updateBoard(response) {
 
 // Parse position string that may include color prefix
 function parsePosition(posStr) {
-    // Remove color prefix if present (e.g., "Rc2" -> "c2" or "Ba7" -> "a7")
-    const match = posStr.match(/[RB]?([a-h][1-8])/);
-    if (!match) {
-        console.error(`Invalid position string: ${posStr}`);
-        return null;
-    }
-    return match[1];  // Return the position part without the color prefix
+    return posStr;
 }
 
 // Render the pieces on the board
@@ -154,8 +149,7 @@ function updatePieces(board) {
             continue;
         }
 
-        // Convert R to W for white pieces
-        const pieceColor = pos.startsWith('R') ? 'W' : (pos.startsWith('B') ? 'B' : value[0]);
+        const pieceColor = value[0];
         const pieceToken = value[1];
 
         // Parse position with color prefix
@@ -210,6 +204,7 @@ function clearBoard() {
 
 // Send the clicked polygon (square) to the server for processing
 function sendPolygonClicked(polygonId) {
+    console.log("Sending move:", polygonId);
     const request = new XMLHttpRequest();
     request.open("POST", "/onClick", false);
     request.setRequestHeader('Content-Type', 'text/plain');
@@ -218,6 +213,10 @@ function sendPolygonClicked(polygonId) {
     if (request.status === 200) {
         const data = JSON.parse(request.response);
         updateBoard(data);
+        // Request current player after move
+        requestCurrentPlayer();
+    } else {
+        console.error("Error sending move:", request.status, request.statusText);
     }
 }
 
