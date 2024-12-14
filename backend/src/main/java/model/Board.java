@@ -84,10 +84,17 @@ public class Board {
         Log.d(TAG, String.format("Moving piece %s of color %s", mover.getClass().getSimpleName(), mover.getColour()));
 
         if (isLegalMove(start, end)) {
+            // Check if there's a piece to capture at the end position
+            BasePiece capturedPiece = boardMap.get(end);
+            if (capturedPiece != null) {
+                Log.d(TAG, String.format("Capturing piece %s of color %s", 
+                    capturedPiece.getClass().getSimpleName(), capturedPiece.getColour()));
+            }
+
             // Remove piece from start position
             boardMap.remove(start);
-
-            // Handle pawn promotion
+            
+            // Place piece at end position (this will automatically remove any captured piece)
             if (mover instanceof Pawn && end.getRow() == (mover.getColour() == Colour.WHITE ? 0 : 7)) {
                 boardMap.put(end, new Queen(mover.getColour()));
             } else {

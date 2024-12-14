@@ -33,13 +33,9 @@ public class Pawn extends BasePiece {
      **/
     @Override
     public void setupDirections() {
+        // Only set up basic forward movement, diagonal captures will be handled separately
         this.directions = new Direction[][] {
-                {Direction.FORWARD},
-                {Direction.FORWARD, Direction.FORWARD},
-                {Direction.FORWARD, Direction.LEFT},
-                {Direction.LEFT, Direction.FORWARD},
-                {Direction.FORWARD, Direction.RIGHT},
-                {Direction.RIGHT, Direction.FORWARD}
+                {Direction.FORWARD}
         };
     }
 
@@ -53,47 +49,56 @@ public class Pawn extends BasePiece {
     public Set<Position> getPossibleMoves(Map<Position, BasePiece> boardMap, Position start) {
         Set<Position> positionSet = new HashSet<>();
         Colour moverCol = this.getColour();
-        Direction[][] steps = this.directions;
 
         // Check if pawn is in starting position
         boolean isInStartPosition = (moverCol == Colour.WHITE && start.getRow() == 6) || 
                                   (moverCol == Colour.BLACK && start.getRow() == 1);
 
-        for (int i = 0; i < steps.length; i++) {
-            Direction[] step = steps[i];
-            Position end = stepOrNull(this, step, start);
+        // Forward moves
+        Position oneStep = stepOrNull(this, new Direction[]{Direction.FORWARD}, start);
+        if (oneStep != null) {
+            // Can only move forward if the square is empty
+            if (boardMap.get(oneStep) == null) {
+                positionSet.add(oneStep);
 
-            if (end != null && !positionSet.contains(end)) {
-                BasePiece target = boardMap.get(end);
-                Log.d(TAG, String.format("Checking move from %s to %s (step: %s)", start, end, Arrays.toString(step)));
-
-                try {
-                    // One step forward - only if square is empty
-                    boolean isOneStepForward = (i == 0 && target == null);
-
-                    // Two steps forward - only from starting position and if both squares are empty
-                    boolean isTwoStepsForward = false;
-                    if (i == 1 && isInStartPosition && target == null) {
-                        Position intermediatePos = stepOrNull(this, new Direction[]{Direction.FORWARD}, start);
-                        isTwoStepsForward = intermediatePos != null && boardMap.get(intermediatePos) == null;
+                // Two steps forward from starting position if path is clear
+                if (isInStartPosition) {
+                    Position twoSteps = stepOrNull(this, new Direction[]{Direction.FORWARD, Direction.FORWARD}, start);
+                    if (twoSteps != null && boardMap.get(twoSteps) == null) {
+                        positionSet.add(twoSteps);
                     }
-
-                    // Diagonal capture - only if there's an enemy piece
-                    boolean isDiagonalCapture = (i > 1 && target != null && target.getColour() != moverCol);
-
-                    if (isOneStepForward || isTwoStepsForward || isDiagonalCapture) {
-                        Log.d(TAG, String.format("Valid move to %s (type: %s)", end, 
-                            isOneStepForward ? "one step" : 
-                            isTwoStepsForward ? "two steps" : "capture"));
-                        positionSet.add(end);
-                    }
-                } catch (Exception e) {
-                    Log.d(TAG, "Error checking move: " + e.getMessage());
                 }
             }
         }
 
+        // Diagonal captures
+        checkDiagonalCapture(boardMap, start, Direction.LEFT, moverCol, positionSet);
+        checkDiagonalCapture(boardMap, start, Direction.RIGHT, moverCol, positionSet);
+
         return positionSet;
+    }
+
+    /**
+     * Helper method to check diagonal captures
+     */
+    private void checkDiagonalCapture(Map<Position, BasePiece> boardMap, Position start, 
+                                    Direction direction, Colour moverCol, Set<Position> positionSet) {
+        try {
+            // First move forward, then left/right for diagonal
+            Position capturePos = start.neighbour(Direction.FORWARD);
+            if (capturePos != null) {
+                capturePos = capturePos.neighbour(direction);
+                if (capturePos != null) {
+                    BasePiece target = boardMap.get(capturePos);
+                    // Can only capture enemy pieces
+                    if (target != null && target.getColour() != moverCol) {
+                        positionSet.add(capturePos);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Position is off the board, ignore
+        }
     }
 
     /**
