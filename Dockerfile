@@ -1,5 +1,5 @@
-# Stage 1: Build the application using JDK 17
-FROM openjdk:17-jdk-slim AS build
+# Stage 1: Build the application using Oracle JDK 17
+FROM oracle/openjdk:17 AS build
 
 WORKDIR /app
 
@@ -14,8 +14,8 @@ RUN chmod +x gradlew
 # Build the application
 RUN ./gradlew build  # or `mvn clean install` for Maven
 
-# Stage 2: Run the application using JRE 17
-FROM openjdk:17-jre-slim
+# Stage 2: Run the application using Oracle JRE 17
+FROM oracle/openjdk:17-jre
 
 WORKDIR /app
 
