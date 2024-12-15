@@ -16,21 +16,16 @@ RUN chmod +x gradlew
 RUN ./gradlew build --no-daemon  # Avoids creating a Gradle daemon for improved container build consistency
 
 # Stage 2: Run the application
-
-FROM openjdk:17-jdk-slim  
+FROM openjdk:17-jdk-slim
 
 # Set the working directory
-
 WORKDIR /app
 
 # Copy the jar file from the build stage
-
 COPY --from=build /app/build/libs/*.jar app.jar
 
 # Expose the default port
-
 EXPOSE 8080
 
 # Command to run the application
-
 CMD ["java", "-jar", "app.jar"]
