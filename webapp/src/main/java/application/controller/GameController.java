@@ -2,23 +2,22 @@ package application.controller;
 
 import abstraction.IGameInterface;
 import common.GameState;
-import main.GameMain;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 public class GameController {
 
-    private IGameInterface game;
+    private final IGameInterface game;
 
-    public GameController() {
-        game = new GameMain();
+    @Autowired
+    public GameController(IGameInterface game) {
+        this.game = game;
     }
 
     @GetMapping("/newGame")
     public void newGame() {
-        game = new GameMain();
+        // Additional logic can be added here if necessary
     }
 
     @GetMapping("/board")

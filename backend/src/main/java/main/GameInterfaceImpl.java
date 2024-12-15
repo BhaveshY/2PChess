@@ -9,29 +9,33 @@ import common.GameState;
 import common.Position;
 import model.Board;
 import model.BasePiece;
+
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import utility.BoardAdapter;
 import utility.Log;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
  * Class containing the main logic of the backend.
  * The click inputs from the webapp are communicated with the backend.
  */
-public class GameMain implements IGameInterface {
 
-    private static final String TAG = GameMain.class.getSimpleName();
+//added @Component annotation to make the class a Spring bean for DI
+@Service
+public class GameInterfaceImpl implements IGameInterface {
+
+    private static final String TAG = GameInterfaceImpl.class.getSimpleName();
     private final Board board;
     private Position moveStartPos;
     private Set<Position> highlightSquares;
 
     /**
-     * GameMain Constructor. Entry point to the backend logic
+     * GameInterfaceImpl Constructor. Entry point to the backend logic
      */
-    public GameMain() {
-        Log.d(TAG, "initGame GameMain()");
+    public GameInterfaceImpl() {
+        Log.d(TAG, "initGame GameInterfaceImpl()");
         board = new Board();
         moveStartPos = null;
         highlightSquares = ImmutableSet.of();

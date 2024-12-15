@@ -1,17 +1,17 @@
 plugins {
-    id 'application'
+    id 'org.springframework.boot' version '2.7.0'
     id 'java'
 }
-
-group = 'org.example'
-version = 'unspecified'
 
 repositories {
     mavenCentral()
 }
 
-application {
-    mainClass = 'main.GameMain'
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.7.0'
+    implementation 'com.google.guava:guava:31.1-jre'
+    implementation 'org.springframework:spring-context:5.3.23'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.0'
 }
 
 java {
@@ -19,22 +19,27 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+// Configure Spring Boot and Gradle jar tasks
+bootJar {
+    // Set the main class for Spring Boot to run
+    mainClass = 'application.SpringApplication'  // Replace with the actual fully qualified main class
+}
+
 jar {
+    // Exclude duplicate files during packaging
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
     manifest {
-        attributes 'Main-Class': application.mainClass
+        // Explicitly set the Main-Class attribute for the jar manifest
+        attributes 'Main-Class': 'application.SpringApplication'  // Replace with the actual main class
     }
+
+    // Add runtime classpath resources to the jar
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 
-dependencies {
-    implementation("com.google.guava:guava:28.2-jre")
-    testImplementation platform('org.junit:junit-bom:5.9.1')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-}
-
 test {
-    enabled = false  // Disable tests for faster builds
+    enabled = false  // Disable tests for faster builds (optional)
 }
-
