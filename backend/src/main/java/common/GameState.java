@@ -10,6 +10,7 @@ import java.util.Collections;
 public class GameState {
     private Map<String, String> board;
     private List<String> possibleMoves;
+    private List<String> highlightSquares;
     private boolean gameOver;
     private String winner;
     private List<String> eliminatedWhitePieces;
@@ -17,6 +18,7 @@ public class GameState {
 
     public GameState() {
         // Default constructor
+        this.highlightSquares = Collections.emptyList();
     }
 
     public GameState(Map<String, String> board, List<String> possibleMoves) {
@@ -77,6 +79,14 @@ public class GameState {
         this.eliminatedBlackPieces = eliminatedBlackPieces;
     }
 
+    public List<String> getHighlightSquares() {
+        return highlightSquares;
+    }
+
+    public void setHighlightSquares(List<String> highlightSquares) {
+        this.highlightSquares = highlightSquares;
+    }
+
     @Override
     public String toString() {
         return "GameState{" +
@@ -86,6 +96,7 @@ public class GameState {
                 ", winner='" + winner + '\'' +
                 ", eliminatedWhitePieces=" + eliminatedWhitePieces +
                 ", eliminatedBlackPieces=" + eliminatedBlackPieces +
+                ", highlightSquares=" + highlightSquares +
                 '}';
     }
 }

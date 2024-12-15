@@ -72,10 +72,10 @@ class GameMainTest {
     @ParameterizedTest
     @ValueSource(strings = {"k2", "", "123", "i3", "bb"})
     void onClick_invalidSquareLabel_noHighlightNoBoardChange(String squareLabel) {
-        Map<String, String> oldBoard = gameMain.getBoard();
+        Map<String, String> oldBoard = gameMain.getBoard().getBoard();
         GameState response = gameMain.onClick(squareLabel);
         assertEquals(0, response.getHighlightSquares().size());
-        assertEquals(oldBoard, gameMain.getBoard());
+        assertEquals(oldBoard, response.getBoard());
     }
 
     /**
@@ -83,11 +83,11 @@ class GameMainTest {
      */
     @Test
     void onClick_invalidMove_noHighlightNoBoardChange() {
-        Map<String, String> oldBoard = gameMain.getBoard();
+        Map<String, String> oldBoard = gameMain.getBoard().getBoard();
         gameMain.onClick("a2");
         GameState response = gameMain.onClick("a5");
         assertEquals(0, response.getHighlightSquares().size());
-        assertEquals(oldBoard, gameMain.getBoard());
+        assertEquals(oldBoard, response.getBoard());
     }
 
     /**
