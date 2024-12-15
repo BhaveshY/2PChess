@@ -14,9 +14,6 @@ dependencies {
     // Google Guava library
     implementation 'com.google.guava:guava:32.1.2-jre'
 
-    // Spring Context (Spring Framework 6.x)
-    implementation 'org.springframework:spring-context:6.0.13'
-
     // Spring Boot starter for testing (includes JUnit 5)
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.1.7'
 }
