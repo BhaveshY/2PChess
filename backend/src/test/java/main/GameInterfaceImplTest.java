@@ -12,18 +12,18 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * This class contains unit tests for the GameMain class.
+ * This class contains unit tests for the GameInterfaceImpl class.
  */
-class GameMainTest {
+class GameInterfaceImplTest {
 
-    private GameMain gameMain;
+    private GameInterfaceImpl gameInterfaceImpl;
 
     /**
-     * Initializes a new GameMain instance before each test.
+     * Initializes a new GameInterfaceImpl instance before each test.
      */
     @BeforeEach
     void initBeforeEachBoardTest() {
-        gameMain = new GameMain();
+        gameInterfaceImpl = new GameInterfaceImpl();
     }
 
     /**
@@ -31,7 +31,7 @@ class GameMainTest {
      */
     @Test
     void onClick_selectEmptySquare_noHighlight() {
-        GameState response = gameMain.onClick("c3");
+        GameState response = gameInterfaceImpl.onClick("c3");
         assertEquals(0, response.getHighlightSquares().size());
     }
 
@@ -40,7 +40,7 @@ class GameMainTest {
      */
     @Test
     void onClick_selectWhitePawnFirstTurn_highlightListNonEmpty() {
-        GameState response = gameMain.onClick("a2");
+        GameState response = gameInterfaceImpl.onClick("a2");
         assertFalse(response.getHighlightSquares().isEmpty());
     }
 
@@ -49,7 +49,7 @@ class GameMainTest {
      */
     @Test
     void onClick_selectNonTurnBlackPawn_noHighlight() {
-        GameState response = gameMain.onClick("a7");
+        GameState response = gameInterfaceImpl.onClick("a7");
         assertEquals(0, response.getHighlightSquares().size());
     }
 
@@ -58,8 +58,8 @@ class GameMainTest {
      */
     @Test
     void onClick_moveWhitePawn_noHighlight() {
-        gameMain.onClick("b2");
-        GameState response = gameMain.onClick("b4");
+        gameInterfaceImpl.onClick("b2");
+        GameState response = gameInterfaceImpl.onClick("b4");
         assertEquals(0, response.getHighlightSquares().size());
     }
 
@@ -72,8 +72,8 @@ class GameMainTest {
     @ParameterizedTest
     @ValueSource(strings = {"k2", "", "123", "i3", "bb"})
     void onClick_invalidSquareLabel_noHighlightNoBoardChange(String squareLabel) {
-        Map<String, String> oldBoard = gameMain.getBoard().getBoard();
-        GameState response = gameMain.onClick(squareLabel);
+        Map<String, String> oldBoard = gameInterfaceImpl.getBoard().getBoard();
+        GameState response = gameInterfaceImpl.onClick(squareLabel);
         assertEquals(0, response.getHighlightSquares().size());
         assertEquals(oldBoard, response.getBoard());
     }
@@ -83,9 +83,9 @@ class GameMainTest {
      */
     @Test
     void onClick_invalidMove_noHighlightNoBoardChange() {
-        Map<String, String> oldBoard = gameMain.getBoard().getBoard();
-        gameMain.onClick("a2");
-        GameState response = gameMain.onClick("a5");
+        Map<String, String> oldBoard = gameInterfaceImpl.getBoard().getBoard();
+        gameInterfaceImpl.onClick("a2");
+        GameState response = gameInterfaceImpl.onClick("a5");
         assertEquals(0, response.getHighlightSquares().size());
         assertEquals(oldBoard, response.getBoard());
     }
@@ -95,7 +95,7 @@ class GameMainTest {
      */
     @Test
     void getTurn_getTurnOnGameStart_whiteTurn() {
-        assertEquals(Colour.WHITE, gameMain.getTurn());
+        assertEquals(Colour.WHITE, gameInterfaceImpl.getTurn());
     }
 
     /**
@@ -103,9 +103,9 @@ class GameMainTest {
      */
     @Test
     void getTurn_getTurnAfterOneValidMove_blackTurn() {
-        gameMain.onClick("e2"); // Select WHITE pawn
-        gameMain.onClick("e4"); // Move WHITE pawn
-        assertEquals(Colour.BLACK, gameMain.getTurn());
+        gameInterfaceImpl.onClick("e2"); // Select WHITE pawn
+        gameInterfaceImpl.onClick("e4"); // Move WHITE pawn
+        assertEquals(Colour.BLACK, gameInterfaceImpl.getTurn());
     }
 
     /**
@@ -114,12 +114,12 @@ class GameMainTest {
     @Test
     void getTurn_getTurnAfterTwoValidMoves_whiteTurn() {
         // WHITE's turn
-        gameMain.onClick("e2");
-        gameMain.onClick("e4");
+        gameInterfaceImpl.onClick("e2");
+        gameInterfaceImpl.onClick("e4");
         // BLACK's turn
-        gameMain.onClick("e7");
-        gameMain.onClick("e5");
-        assertEquals(Colour.WHITE, gameMain.getTurn());
+        gameInterfaceImpl.onClick("e7");
+        gameInterfaceImpl.onClick("e5");
+        assertEquals(Colour.WHITE, gameInterfaceImpl.getTurn());
     }
 
     /**
@@ -128,14 +128,14 @@ class GameMainTest {
     @Test
     void onClick_pawnCapture_successfulCapture() {
         // WHITE's turn - move pawn to e4
-        gameMain.onClick("e2");
-        gameMain.onClick("e4");
+        gameInterfaceImpl.onClick("e2");
+        gameInterfaceImpl.onClick("e4");
         // BLACK's turn - move pawn to d5
-        gameMain.onClick("d7");
-        gameMain.onClick("d5");
+        gameInterfaceImpl.onClick("d7");
+        gameInterfaceImpl.onClick("d5");
         // WHITE's turn - capture BLACK pawn
-        gameMain.onClick("e4");
-        GameState response = gameMain.onClick("d5");
+        gameInterfaceImpl.onClick("e4");
+        GameState response = gameInterfaceImpl.onClick("d5");
         
         Map<String, String> board = response.getBoard();
         assertEquals("WP", board.get("d5")); // WHITE pawn should be on d5
