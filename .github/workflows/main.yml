@@ -64,4 +64,4 @@ jobs:
       # 9. Push Docker Image to Docker Hub
       - name: Push Docker Image
         run: |
-          docker push ${{ secrets.dckr_pat_05ZiW0OXrbYPXEZme9-7euKuKlg }}/jchess_application:latest
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/jchess_application:latest
