@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-slim
+FROM openjdk:17-jdk-slim AS build
 
 # Stage 1: Build the application
 WORKDIR /app
@@ -15,7 +15,7 @@ RUN chmod +x gradlew
 RUN ./gradlew build  # or `mvn clean install` for Maven
 
 # Stage 2: Run the application
-FROM openjdk:8-jre-slim
+FROM openjdk:17-jre-slim
 
 WORKDIR /app
 
