@@ -1,15 +1,17 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '2.7.17'
-    id 'io.spring.dependency-management' version '1.1.3'
+    id 'org.springframework.boot' version '3.1.7' // Update to a Spring Boot version compatible with Java 17
+    id 'io.spring.dependency-management' version '1.1.4'
 }
 
+// Specify Java compatibility explicitly
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 group = 'org.example'
 version = 'unspecified'
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-}
 
 repositories {
     mavenCentral()
