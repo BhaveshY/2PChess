@@ -1,29 +1,31 @@
+# Stage 1: Build the application
 FROM openjdk:17-jdk-slim AS build
 
-# Stage 1: Build the application
+# Set the working directory
 WORKDIR /app
 
-# Copy gradle wrapper files and project files
+# Copy the Gradle wrapper and configuration files
 COPY gradlew ./
 COPY gradle ./gradle
 COPY webapp/ ./
 
-# Grant execute permissions to gradlew
+# Grant execute permissions to the Gradle wrapper
 RUN chmod +x gradlew
 
 # Build the application
-RUN ./gradlew build  # or `mvn clean install` for Maven
+RUN ./gradlew build --no-daemon  # Avoids creating a Gradle daemon for improved container build consistency
 
 # Stage 2: Run the application
 FROM openjdk:17-jre-slim
 
+# Set the working directory
 WORKDIR /app
 
-# Copy the jar file generated in the build stage
-COPY --from=0 /app/build/libs/*.jar app.jar
+# Copy the jar file from the build stage
+COPY --from=build /app/build/libs/*.jar app.jar
 
+# Expose the default port
 EXPOSE 8080
 
+# Command to run the application
 CMD ["java", "-jar", "app.jar"]
-
-
