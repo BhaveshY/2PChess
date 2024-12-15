@@ -16,8 +16,13 @@ dependencies {
 }
 
 java {
+<<<<<<< HEAD
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+=======
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+>>>>>>> ce87f5a828c01db5347530080d18dcbc2cb81212
 }
 
 bootJar {
