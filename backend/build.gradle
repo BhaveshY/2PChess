@@ -1,6 +1,8 @@
 plugins {
-    id 'org.springframework.boot' version '2.7.0'
+    id 'org.springframework.boot' version '2.7.17'
     id 'java'
+    id 'io.spring.dependency-management' version '1.1.3'
+    // Recommended for dependency management
 }
 
 repositories {
@@ -8,38 +10,33 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.7.0'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.google.guava:guava:31.1-jre'
-    implementation 'org.springframework:spring-context:5.3.23'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.0'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
-// Configure Spring Boot and Gradle jar tasks
 bootJar {
-    // Set the main class for Spring Boot to run
-    mainClass = 'application.SpringApplication'  // Replace with the actual fully qualified main class
+    mainClass = 'application.SpringApplication' // Update with your actual main class
 }
 
 jar {
-    // Exclude duplicate files during packaging
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     manifest {
-        // Explicitly set the Main-Class attribute for the jar manifest
-        attributes 'Main-Class': 'application.SpringApplication'  // Replace with the actual main class
+        attributes 'Main-Class': 'application.SpringApplication' // Update with your actual main class
     }
 
-    // Add runtime classpath resources to the jar
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 
-test {
-    enabled = false  // Disable tests for faster builds (optional)
+tasks.withType(Test).configureEach {
+    useJUnitPlatform() // Enables modern JUnit 5 testing platform if needed
+    enabled = false    // Disable tests for faster builds (optional)
 }
