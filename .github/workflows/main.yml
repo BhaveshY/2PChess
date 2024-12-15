@@ -44,18 +44,3 @@ jobs:
       # 5. Run unit tests with Gradle
       - name: Run tests with Gradle
         run: ./gradlew test --no-daemon
-
-      # 6. Generate JaCoCo test coverage report (optional, if using JaCoCo for coverage)
-      - name: Generate JaCoCo test coverage report
-        run: ./gradlew jacocoTestReport --no-daemon
-
-      # 7. Upload JaCoCo test coverage report as an artifact (optional)
-      - name: Upload JaCoCo report
-        uses: actions/upload-artifact@v3
-        with:
-          name: jacoco-report
-          path: build/reports/jacoco/test/html/*  # Adjust path as necessary to match your JaCoCo output
-
-      # 8. Optional deployment step (uncomment if you want to deploy after a successful build)
-      # - name: Deploy to Production (if applicable)
-      #   run: ./deploy.sh   # Replace with your deployment steps
