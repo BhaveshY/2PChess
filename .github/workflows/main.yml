@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        java-version: [17]  # Run the CI job on specified Java version
+        java-version: [23]  # Run the CI job on specified Java version
 
     steps:
       # 1. Checkout code from the repository
