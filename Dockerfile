@@ -1,10 +1,17 @@
-# Stage 1: Build the application
-FROM openjdk:8-jdk-slim AS build
+FROM openjdk:8-jdk-slim
 
+# Stage 1: Build the application
 WORKDIR /app
 
-# Copy build files and build the application (use your build tool, e.g., Maven or Gradle)
+# Copy gradle wrapper files and project files
+COPY gradlew ./
+COPY gradle ./gradle
 COPY webapp/ ./
+
+# Grant execute permissions to gradlew
+RUN chmod +x gradlew
+
+# Build the application
 RUN ./gradlew build  # or `mvn clean install` for Maven
 
 # Stage 2: Run the application
@@ -12,12 +19,11 @@ FROM openjdk:8-jre-slim
 
 WORKDIR /app
 
-# Copy only the built JAR from the previous stage
-COPY --from=build /app/build/libs/*.jar app.jar
+# Copy the jar file generated in the build stage
+COPY --from=0 /app/build/libs/*.jar app.jar
 
-# Expose the port for the application
 EXPOSE 8080
 
-# Start the application
 CMD ["java", "-jar", "app.jar"]
+
 
