@@ -1,5 +1,5 @@
-# Stage 1: Build the application using Oracle JDK 17
-FROM oracle/openjdk:17 AS build
+# Stage 1: Build the application using Eclipse Adoptium JDK 17
+FROM adoptium:17-jdk AS build
 
 WORKDIR /app
 
@@ -14,8 +14,8 @@ RUN chmod +x gradlew
 # Build the application
 RUN ./gradlew build  # or `mvn clean install` for Maven
 
-# Stage 2: Run the application using Oracle JRE 17
-FROM oracle/openjdk:17-jre
+# Stage 2: Run the application using Eclipse Adoptium JRE 17
+FROM adoptium:17-jre
 
 WORKDIR /app
 
