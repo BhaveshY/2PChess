@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '2.7.0'
+    id 'org.springframework.boot' version '3.1.7'
     id 'java'
 }
 
@@ -8,16 +8,26 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.7.0'
-    implementation 'com.google.guava:guava:31.1-jre'
-    implementation 'org.springframework:spring-context:5.3.23'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.0'
+    // Spring Boot starter for web applications
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.1.7'
+
+    // Google Guava library
+    implementation 'com.google.guava:guava:32.1.2-jre'
+
+    // Spring Context (Spring Framework 6.x)
+    implementation 'org.springframework:spring-context:6.0.13'
+
+    // Spring Boot starter for testing (includes JUnit 5)
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.1.7'
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
+
+
 
 // Configure Spring Boot and Gradle jar tasks
 bootJar {
