@@ -1,0 +1,61 @@
+name: Java CI with Gradle
+
+on:
+  push:
+    branches:
+      - main  # Trigger CI on push to the 'main' branch
+  pull_request:
+    branches:
+      - main  # Trigger CI on pull requests targeting 'main'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Set the environment for the job
+
+    strategy:
+      matrix:
+        java-version: [23]  # Run the CI job on multiple Java versions
+
+    steps:
+      # 1. Checkout code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # 2. Set up Java JDK (specified by the matrix)
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v2
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'  # Use Temurin JDK
+
+      # 3. Cache Gradle dependencies to speed up subsequent builds
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # 4. Build the application with Gradle (compile code, resolve dependencies)
+      - name: Build with Gradle
+        run: ./gradlew build --no-daemon  # The '--no-daemon' flag is useful for CI environments
+
+      # 5. Run unit tests with Gradle
+      - name: Run tests with Gradle
+        run: ./gradlew test --no-daemon
+
+      # 6. Generate JaCoCo test coverage report (optional, if using JaCoCo for coverage)
+      - name: Generate JaCoCo test coverage report
+        run: ./gradlew jacocoTestReport --no-daemon
+
+      # 7. Upload JaCoCo test coverage report as an artifact (optional)
+      - name: Upload JaCoCo report
+        uses: actions/upload-artifact@v3
+        with:
+          name: jacoco-report
+          path: build/reports/jacoco/test/html/*  # Adjust path as necessary to match your JaCoCo output
+
+      # 8. Optional deployment step (uncomment if you want to deploy after a successful build)
+      # - name: Deploy to Production (if applicable)
+      #   run: ./deploy.sh   # Replace with your deployment steps
