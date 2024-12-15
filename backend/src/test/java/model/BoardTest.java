@@ -12,114 +12,125 @@ import java.util.Map;
 import java.util.Set;
 import java.util.List;
 
-import static common.Position.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * This class contains unit tests for the Board class.
- */
 class BoardTest {
-
     private Board board;
     private Map<Position, BasePiece> boardMap;
 
     @BeforeEach
     void initBeforeEachBoardTest() {
         board = new Board();
-        boardMap = board.boardMap;
+        boardMap = board.getBoardMap();
     }
 
     @Test
     void move_pieceMoveToEmptySquare_startPositionEmptyAndEndPositionOccupied() throws InvalidPositionException, InvalidMoveException {
-        board.move(E2R, E4R);
-        assertNull(boardMap.get(E2R));
-        assertNotNull(boardMap.get(E4R));
-        assertTrue(boardMap.get(E4R) instanceof Pawn);
+        Position start = Position.get(Colour.WHITE, 6, 4); // e2
+        Position end = Position.get(Colour.WHITE, 4, 4);   // e4
+        board.move(start, end);
+        assertNull(boardMap.get(start));
+        assertNotNull(boardMap.get(end));
+        assertTrue(boardMap.get(end) instanceof Pawn);
     }
 
     @Test
-    void move_pawnToOppositeEndRow_pawnUpgradeToQueen() throws InvalidPositionException, InvalidMoveException {
-        // Setup: Place a pawn near promotion square
-        BasePiece redPawn = new Pawn(Colour.WHITE);
-        boardMap.put(A7R, redPawn);
-        boardMap.remove(A8R); // Clear the promotion square
+    void move_whitePawnToLastRow_pawnUpgradeToQueen() throws InvalidPositionException, InvalidMoveException {
+        // Setup: Place a white pawn near promotion square
+        boardMap.clear();
+        Position start = Position.get(Colour.WHITE, 1, 0); // a7
+        Position end = Position.get(Colour.WHITE, 0, 0);   // a8
+        BasePiece whitePawn = new Pawn(Colour.WHITE);
+        boardMap.put(start, whitePawn);
         
         // Move pawn to promotion square
-        board.move(A7R, A8R);
+        board.move(start, end);
 
         // Verify promotion
-        BasePiece promotedPiece = boardMap.get(A8R);
+        BasePiece promotedPiece = boardMap.get(end);
         assertInstanceOf(Queen.class, promotedPiece);
         assertEquals(Colour.WHITE, promotedPiece.getColour());
     }
 
     @Test
-    void move_shortCastlingLegalMove_castlingHappens() throws InvalidPositionException, InvalidMoveException {
+    void move_whiteKingSideCastling_castlingHappens() throws InvalidPositionException, InvalidMoveException {
         // Setup: Clear squares between king and rook
-        boardMap.remove(F1R);
-        boardMap.remove(G1R);
+        boardMap.clear();
+        Position kingStart = Position.get(Colour.WHITE, 7, 4); // e1
+        Position kingEnd = Position.get(Colour.WHITE, 7, 6);   // g1
+        Position rookStart = Position.get(Colour.WHITE, 7, 7); // h1
+        Position rookEnd = Position.get(Colour.WHITE, 7, 5);   // f1
 
-        BasePiece king = boardMap.get(E1R);
-        BasePiece rightRook = boardMap.get(H1R);
+        BasePiece king = new King(Colour.WHITE);
+        BasePiece rook = new Rook(Colour.WHITE);
+        boardMap.put(kingStart, king);
+        boardMap.put(rookStart, rook);
 
         // Perform castling
-        board.move(E1R, G1R);
+        board.move(kingStart, kingEnd);
         
         // Verify positions
-        assertEquals(king, boardMap.get(G1R));
-        assertEquals(rightRook, boardMap.get(F1R));
-        assertNull(boardMap.get(E1R));
-        assertNull(boardMap.get(H1R));
+        assertEquals(king, boardMap.get(kingEnd));
+        assertEquals(rook, boardMap.get(rookEnd));
+        assertNull(boardMap.get(kingStart));
+        assertNull(boardMap.get(rookStart));
     }
 
     @Test
-    void move_longCastlingLegalMove_castlingHappens() throws InvalidPositionException, InvalidMoveException {
+    void move_whiteQueenSideCastling_castlingHappens() throws InvalidPositionException, InvalidMoveException {
         // Setup: Clear squares between king and rook
-        boardMap.remove(D1R);
-        boardMap.remove(C1R);
-        boardMap.remove(B1R);
+        boardMap.clear();
+        Position kingStart = Position.get(Colour.WHITE, 7, 4); // e1
+        Position kingEnd = Position.get(Colour.WHITE, 7, 2);   // c1
+        Position rookStart = Position.get(Colour.WHITE, 7, 0); // a1
+        Position rookEnd = Position.get(Colour.WHITE, 7, 3);   // d1
 
-        BasePiece king = boardMap.get(E1R);
-        BasePiece leftRook = boardMap.get(A1R);
+        BasePiece king = new King(Colour.WHITE);
+        BasePiece rook = new Rook(Colour.WHITE);
+        boardMap.put(kingStart, king);
+        boardMap.put(rookStart, rook);
 
         // Perform castling
-        board.move(E1R, C1R);
+        board.move(kingStart, kingEnd);
         
         // Verify positions
-        assertEquals(king, boardMap.get(C1R));
-        assertEquals(leftRook, boardMap.get(D1R));
-        assertNull(boardMap.get(E1R));
-        assertNull(boardMap.get(A1R));
+        assertEquals(king, boardMap.get(kingEnd));
+        assertEquals(rook, boardMap.get(rookEnd));
+        assertNull(boardMap.get(kingStart));
+        assertNull(boardMap.get(rookStart));
     }
 
     @Test
-    void getPossibleMoves_emptySquare_emptyMovesList() {
-        Set<Position> possibleMoves = board.getPossibleMoves(E4R);
+    void getPossibleMoves_emptySquare_emptyMovesList() throws InvalidPositionException {
+        Position pos = Position.get(Colour.WHITE, 4, 4); // e4
+        Set<Position> possibleMoves = board.getPossibleMoves(pos);
         assertTrue(possibleMoves.isEmpty());
     }
 
     @Test
-    void getPossibleMoves_blockedPawn_emptyMovesList() {
-        // A pawn blocked by another piece should have no moves
-        Set<Position> possibleMoves = board.getPossibleMoves(E2R);
+    void getPossibleMoves_blockedPawn_emptyMovesList() throws InvalidPositionException {
+        Position pos = Position.get(Colour.WHITE, 6, 4); // e2
+        Set<Position> possibleMoves = board.getPossibleMoves(pos);
         assertTrue(possibleMoves.isEmpty());
     }
 
     @Test
-    void getPossibleMoves_unobstructedPawn_hasMoves() {
-        // Clear the square in front of the pawn
-        boardMap.remove(E3R);
-        Set<Position> possibleMoves = board.getPossibleMoves(E2R);
+    void getPossibleMoves_unobstructedPawn_hasMoves() throws InvalidPositionException {
+        Position pawnPos = Position.get(Colour.WHITE, 6, 4); // e2
+        Position frontPos = Position.get(Colour.WHITE, 5, 4); // e3
+        boardMap.remove(frontPos);
+        Set<Position> possibleMoves = board.getPossibleMoves(pawnPos);
         assertFalse(possibleMoves.isEmpty());
     }
 
     @Test
     void move_capturePiece_targetPieceRemovedFromBoard() throws InvalidMoveException, InvalidPositionException {
-        // Setup: Place a white pawn and a black pawn in adjacent positions
+        // Setup: Place a white pawn and a black pawn in capture position
+        boardMap.clear();
+        Position whitePawnPos = Position.get(Colour.WHITE, 4, 4); // e4
+        Position blackPawnPos = Position.get(Colour.BLACK, 3, 5); // f5
         BasePiece whitePawn = new Pawn(Colour.WHITE);
         BasePiece blackPawn = new Pawn(Colour.BLACK);
-        Position whitePawnPos = Position.get(Colour.WHITE, 4, 4);
-        Position blackPawnPos = Position.get(Colour.BLACK, 5, 5);
         boardMap.put(whitePawnPos, whitePawn);
         boardMap.put(blackPawnPos, blackPawn);
 
@@ -127,13 +138,10 @@ class BoardTest {
         board.move(whitePawnPos, blackPawnPos);
 
         // Assert that the black pawn is no longer on the board
-        assertNull(boardMap.get(blackPawnPos));
-        // Assert that the white pawn is now at the new position
-        assertNotNull(boardMap.get(blackPawnPos));
-        assertTrue(boardMap.get(blackPawnPos) instanceof Pawn);
-        assertEquals(Colour.WHITE, boardMap.get(blackPawnPos).getColour());
+        assertNull(boardMap.get(whitePawnPos));
+        assertEquals(whitePawn, boardMap.get(blackPawnPos));
         // Assert that the black pawn is in the eliminated pieces list
         Map<String, List<String>> eliminatedPieces = board.getEliminatedPieces();
-        assertTrue(eliminatedPieces.get("black").stream().anyMatch(piece -> piece.contains("Pawn")));
+        assertTrue(eliminatedPieces.get("black").contains("BP"));
     }
 }

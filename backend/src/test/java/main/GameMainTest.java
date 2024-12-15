@@ -48,7 +48,7 @@ class GameMainTest {
      * Tests the onClick method when selecting a non-turn BLACK pawn, expecting no highlight.
      */
     @Test
-    void onClick_selectNonTurnBluePawn_noHighlight() {
+    void onClick_selectNonTurnBlackPawn_noHighlight() {
         GameState response = gameMain.onClick("a7");
         assertEquals(0, response.getHighlightSquares().size());
     }
@@ -126,7 +126,7 @@ class GameMainTest {
      * Tests a complete pawn capture sequence
      */
     @Test
-        void onClick_pawnCapture_successfulCapture() {
+    void onClick_pawnCapture_successfulCapture() {
         // WHITE's turn - move pawn to e4
         gameMain.onClick("e2");
         gameMain.onClick("e4");
@@ -138,7 +138,7 @@ class GameMainTest {
         GameState response = gameMain.onClick("d5");
         
         Map<String, String> board = response.getBoard();
-        assertEquals("RR", board.get("d5")); // WHITE pawn should be on d5
+        assertEquals("WP", board.get("d5")); // WHITE pawn should be on d5
         assertNull(board.get("e4")); // Original square should be empty
     }
 }

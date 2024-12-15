@@ -2,142 +2,160 @@ package model;
 
 import common.Colour;
 import common.Position;
+import common.InvalidPositionException;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static common.Position.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class KingTest {
 
     @Test
-    void testGetHighlightPolygons() {
+    void testGetPossibleMoves() throws InvalidPositionException {
         BasePiece king = new King(Colour.WHITE);
         Map<Position, BasePiece> boardMap = new HashMap<>();
-        boardMap.put(E2R, king);
+        Position startPos = Position.get(Colour.WHITE, 6, 4); // e2
+        Position endPos = Position.get(Colour.WHITE, 5, 4);   // e3
+        boardMap.put(startPos, king);
 
-        Set<Position> actualKingMoves = king.getHighlightPolygons(boardMap, E2R);
-        assertTrue(actualKingMoves.contains(E3R));
+        Set<Position> actualKingMoves = king.getPossibleMoves(boardMap, startPos);
+        assertTrue(actualKingMoves.contains(endPos));
     }
 
     @Test
-    void testGetHighlightPolygonsWithFriendlyPiece() {
+    void testGetPossibleMovesWithFriendlyPiece() throws InvalidPositionException {
         BasePiece king = new King(Colour.BLACK);
         BasePiece piece = new Pawn(Colour.BLACK);
         Map<Position, BasePiece> boardMap = new HashMap<>();
 
-        Position startPosition = E4B;
-        Position endPosition = D3B;
+        Position startPos = Position.get(Colour.BLACK, 4, 4); // e4
+        Position endPos = Position.get(Colour.BLACK, 5, 3);   // d3
+        boardMap.put(startPos, king);
+        boardMap.put(endPos, piece);
 
-        boardMap.put(startPosition, king);
-        boardMap.put(endPosition, piece);
-
-        Set<Position> actualKingMoves = king.getHighlightPolygons(boardMap, startPosition);
-        assertFalse(actualKingMoves.contains(endPosition));
+        Set<Position> actualKingMoves = king.getPossibleMoves(boardMap, startPos);
+        assertFalse(actualKingMoves.contains(endPos));
     }
 
     @Test
-    void testGetHighlightPolygonsWithEnemyPiece() {
+    void testGetPossibleMovesWithEnemyPiece() throws InvalidPositionException {
         BasePiece king = new King(Colour.BLACK);
         BasePiece piece = new Pawn(Colour.WHITE);
         Map<Position, BasePiece> boardMap = new HashMap<>();
 
-        Position startPosition = E4B;
-        Position endPosition = D3B;
+        Position startPos = Position.get(Colour.BLACK, 4, 4); // e4
+        Position endPos = Position.get(Colour.WHITE, 5, 3);   // d3
+        boardMap.put(startPos, king);
+        boardMap.put(endPos, piece);
 
-        boardMap.put(startPosition, king);
-        boardMap.put(endPosition, piece);
-
-        Set<Position> actualKingMoves = king.getHighlightPolygons(boardMap, startPosition);
-        assertTrue(actualKingMoves.contains(endPosition));
+        Set<Position> actualKingMoves = king.getPossibleMoves(boardMap, startPos);
+        assertTrue(actualKingMoves.contains(endPos));
     }
 
     @Test
-    void testGetHighlightPolygonsAllDirections() {
+    void testGetPossibleMovesAllDirections() throws InvalidPositionException {
         BasePiece king = new King(Colour.BLACK);
         Map<Position, BasePiece> boardMap = new HashMap<>();
-        Position startPosition = E4B;
-        boardMap.put(startPosition, king);
+        Position startPos = Position.get(Colour.BLACK, 4, 4); // e4
+        boardMap.put(startPos, king);
 
-        Set<Position> actualKingMoves = king.getHighlightPolygons(boardMap, startPosition);
+        Set<Position> actualKingMoves = king.getPossibleMoves(boardMap, startPos);
         
-        // Test key positions in each direction
-        assertTrue(actualKingMoves.contains(E5B)); // Forward
-        assertTrue(actualKingMoves.contains(E3B)); // Backward
-        assertTrue(actualKingMoves.contains(D4B)); // Left
-        assertTrue(actualKingMoves.contains(F4B)); // Right
-        assertTrue(actualKingMoves.contains(D3B)); // Diagonal back-left
-        assertTrue(actualKingMoves.contains(F3B)); // Diagonal back-right
-        assertTrue(actualKingMoves.contains(D5B)); // Diagonal forward-left
-        assertTrue(actualKingMoves.contains(F5B)); // Diagonal forward-right
+        // Test all eight directions
+        assertTrue(actualKingMoves.contains(Position.get(Colour.BLACK, 3, 4))); // Forward
+        assertTrue(actualKingMoves.contains(Position.get(Colour.BLACK, 5, 4))); // Backward
+        assertTrue(actualKingMoves.contains(Position.get(Colour.BLACK, 4, 3))); // Left
+        assertTrue(actualKingMoves.contains(Position.get(Colour.BLACK, 4, 5))); // Right
+        assertTrue(actualKingMoves.contains(Position.get(Colour.BLACK, 5, 3))); // Diagonal back-left
+        assertTrue(actualKingMoves.contains(Position.get(Colour.BLACK, 5, 5))); // Diagonal back-right
+        assertTrue(actualKingMoves.contains(Position.get(Colour.BLACK, 3, 3))); // Diagonal forward-left
+        assertTrue(actualKingMoves.contains(Position.get(Colour.BLACK, 3, 5))); // Diagonal forward-right
     }
 
     @Test
-    void testCastlingKingSide() {
+    void testCastlingKingSide() throws InvalidPositionException {
         BasePiece king = new King(Colour.WHITE);
         BasePiece rook = new Rook(Colour.WHITE);
         Map<Position, BasePiece> boardMap = new HashMap<>();
 
-        Position kingPosition = E1R;
-        Position rookPosition = H1R;
+        Position kingPos = Position.get(Colour.WHITE, 7, 4); // e1
+        Position rookPos = Position.get(Colour.WHITE, 7, 7); // h1
+        Position castlePos = Position.get(Colour.WHITE, 7, 6); // g1
 
-        boardMap.put(kingPosition, king);
-        boardMap.put(rookPosition, rook);
+        boardMap.put(kingPos, king);
+        boardMap.put(rookPos, rook);
 
-        Set<Position> actualKingMoves = king.getHighlightPolygons(boardMap, kingPosition);
-        assertTrue(actualKingMoves.contains(G1R));
+        Set<Position> actualKingMoves = king.getPossibleMoves(boardMap, kingPos);
+        assertTrue(actualKingMoves.contains(castlePos));
     }
 
     @Test
-    void testCastlingKingSideBlocked() {
-        BasePiece king = new King(Colour.WHITE);
-        BasePiece rook = new Rook(Colour.WHITE);
-        Position kingPosition = E1R;
-        Position rookPosition = H1R;
-        Position knightPosition = G1R;
-
-        Map<Position, BasePiece> boardMap = new HashMap<>();
-        boardMap.put(kingPosition, king);
-        boardMap.put(rookPosition, rook);
-        boardMap.put(knightPosition, new Knight(Colour.WHITE));
-
-        Set<Position> actualKingMoves = king.getHighlightPolygons(boardMap, kingPosition);
-        assertFalse(actualKingMoves.contains(G1R));
-    }
-
-    @Test
-    void testCastlingQueenSide() {
+    void testCastlingKingSideBlocked() throws InvalidPositionException {
         BasePiece king = new King(Colour.WHITE);
         BasePiece rook = new Rook(Colour.WHITE);
         Map<Position, BasePiece> boardMap = new HashMap<>();
 
-        Position kingPosition = E1R;
-        Position rookPosition = A1R;
+        Position kingPos = Position.get(Colour.WHITE, 7, 4); // e1
+        Position rookPos = Position.get(Colour.WHITE, 7, 7); // h1
+        Position blockPos = Position.get(Colour.WHITE, 7, 6); // g1
+        Position castlePos = Position.get(Colour.WHITE, 7, 6); // g1
 
-        boardMap.put(kingPosition, king);
-        boardMap.put(rookPosition, rook);
+        boardMap.put(kingPos, king);
+        boardMap.put(rookPos, rook);
+        boardMap.put(blockPos, new Knight(Colour.WHITE));
 
-        Set<Position> actualKingMoves = king.getHighlightPolygons(boardMap, kingPosition);
-        assertTrue(actualKingMoves.contains(C1R));
+        Set<Position> actualKingMoves = king.getPossibleMoves(boardMap, kingPos);
+        assertFalse(actualKingMoves.contains(castlePos));
     }
 
     @Test
-    void testCastlingQueenSideBlocked() {
+    void testCastlingQueenSide() throws InvalidPositionException {
         BasePiece king = new King(Colour.WHITE);
         BasePiece rook = new Rook(Colour.WHITE);
-        Position kingPosition = E1R;
-        Position rookPosition = A1R;
-        Position knightPosition = C1R;
-
         Map<Position, BasePiece> boardMap = new HashMap<>();
-        boardMap.put(kingPosition, king);
-        boardMap.put(rookPosition, rook);
-        boardMap.put(knightPosition, new Knight(Colour.WHITE));
 
-        Set<Position> actualKingMoves = king.getHighlightPolygons(boardMap, kingPosition);
-        assertFalse(actualKingMoves.contains(C1R));
+        Position kingPos = Position.get(Colour.WHITE, 7, 4); // e1
+        Position rookPos = Position.get(Colour.WHITE, 7, 0); // a1
+        Position castlePos = Position.get(Colour.WHITE, 7, 2); // c1
+
+        boardMap.put(kingPos, king);
+        boardMap.put(rookPos, rook);
+
+        Set<Position> actualKingMoves = king.getPossibleMoves(boardMap, kingPos);
+        assertTrue(actualKingMoves.contains(castlePos));
+    }
+
+    @Test
+    void testCastlingQueenSideBlocked() throws InvalidPositionException {
+        BasePiece king = new King(Colour.WHITE);
+        BasePiece rook = new Rook(Colour.WHITE);
+        Map<Position, BasePiece> boardMap = new HashMap<>();
+
+        Position kingPos = Position.get(Colour.WHITE, 7, 4); // e1
+        Position rookPos = Position.get(Colour.WHITE, 7, 0); // a1
+        Position blockPos = Position.get(Colour.WHITE, 7, 2); // c1
+        Position castlePos = Position.get(Colour.WHITE, 7, 2); // c1
+
+        boardMap.put(kingPos, king);
+        boardMap.put(rookPos, rook);
+        boardMap.put(blockPos, new Knight(Colour.WHITE));
+
+        Set<Position> actualKingMoves = king.getPossibleMoves(boardMap, kingPos);
+        assertFalse(actualKingMoves.contains(castlePos));
+    }
+
+    @Test
+    void toString_whiteKing_correctFormat() {
+        BasePiece king = new King(Colour.WHITE);
+        assertEquals("WK", king.toString());
+    }
+
+    @Test
+    void toString_blackKing_correctFormat() {
+        BasePiece king = new King(Colour.BLACK);
+        assertEquals("BK", king.toString());
     }
 }

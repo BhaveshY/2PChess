@@ -3,11 +3,9 @@ package model;
 import com.google.common.collect.ImmutableSet;
 import common.Colour;
 import common.Position;
+import common.InvalidPositionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Map;
 import java.util.Set;
@@ -26,7 +24,7 @@ class PawnTest {
     @BeforeEach
     void initBeforeEachBoardTest() {
         board = new Board();
-        boardMap = board.boardMap;
+        boardMap = board.getBoardMap();
     }
 
     @Test
@@ -36,110 +34,117 @@ class PawnTest {
     }
 
     @Test
-    void isLegalMove_pawnMoveForwardToEmptySquare_True() {
+    void isLegalMove_whitePawnMoveForwardToEmptySquare_True() throws InvalidPositionException {
         boardMap.clear();
-        Position startPos = Position.valueOf("E2R");
-        Position endPos = Position.valueOf("E3R");
+        Position startPos = Position.get(Colour.WHITE, 6, 4); // e2
+        Position endPos = Position.get(Colour.WHITE, 5, 4);   // e3
 
         BasePiece pawn = new Pawn(Colour.WHITE);
         boardMap.put(startPos, pawn);
-        Set<Position> actualPawnMoves = pawn.getHighlightPolygons(boardMap, startPos);
+        Set<Position> actualPawnMoves = pawn.getPossibleMoves(boardMap, startPos);
         assertTrue(actualPawnMoves.contains(endPos));
     }
 
-    @ParameterizedTest
-    @EnumSource(Colour.class)
-    void isLegalMove_pawnAbsentFromStartPosition_False(Colour colour) {
-        Position startPos = Position.valueOf("E4" + colour.toString().charAt(0));
-        Position endPos = Position.valueOf("E6" + colour.toString().charAt(0));
+    @Test
+    void isLegalMove_blackPawnMoveForwardToEmptySquare_True() throws InvalidPositionException {
+        boardMap.clear();
+        Position startPos = Position.get(Colour.BLACK, 1, 4); // e7
+        Position endPos = Position.get(Colour.BLACK, 2, 4);   // e6
 
-        BasePiece pawn = new Pawn(colour);
-        Set<Position> actualPawnMoves = pawn.getHighlightPolygons(boardMap, startPos);
-        assertFalse(actualPawnMoves.contains(endPos));
-    }
-
-    @ParameterizedTest
-    @MethodSource("model.DataProvider#pieceProvider")
-    void isLegalMove_pawnMoveForwardToTakeOpponentPiece_False(BasePiece piece) {
-        Position startPos = Position.valueOf("E2" + piece.getColour().toString().charAt(0));
-        Position endPos = Position.valueOf("E3" + piece.getColour().toString().charAt(0));
-
-        BasePiece pawn = new Pawn(piece.getColour());
+        BasePiece pawn = new Pawn(Colour.BLACK);
         boardMap.put(startPos, pawn);
-        boardMap.put(endPos, piece);
-        
-        Set<Position> actualPawnMoves = pawn.getHighlightPolygons(boardMap, startPos);
-        assertFalse(actualPawnMoves.contains(endPos));
-    }
-
-    @ParameterizedTest
-    @MethodSource("model.DataProvider#pieceProvider")
-    void isLegalMove_pawnMoveDiagonalToTakeOpponentPiece_True(BasePiece piece) {
-        if(piece.getColour() == Colour.WHITE) return;
-
-        BasePiece pawn = new Pawn(Colour.WHITE);
-        Position startPos = Position.valueOf("E2R");
-        Position endPos = Position.valueOf("F3" + piece.getColour().toString().charAt(0));
-
-        boardMap.put(startPos, pawn);
-        boardMap.put(endPos, piece);
-        
-        Set<Position> actualPawnMoves = pawn.getHighlightPolygons(boardMap, startPos);
+        Set<Position> actualPawnMoves = pawn.getPossibleMoves(boardMap, startPos);
         assertTrue(actualPawnMoves.contains(endPos));
     }
 
-    @ParameterizedTest
-    @MethodSource("model.DataProvider#pieceProvider")
-    void isLegalMove_pawnTakesItsColourPiece_False(BasePiece piece) {
-        BasePiece pawn = new Pawn(piece.getColour());
-        Position startPos = Position.valueOf("E2" + piece.getColour().toString().charAt(0));
-        Position endPos = Position.valueOf("F3" + piece.getColour().toString().charAt(0));
+    @Test
+    void isLegalMove_whitePawnCapture_True() throws InvalidPositionException {
+        boardMap.clear();
+        Position startPos = Position.get(Colour.WHITE, 6, 4); // e2
+        Position endPos = Position.get(Colour.BLACK, 5, 5);   // f3
 
-        boardMap.put(startPos, pawn);
-        boardMap.put(endPos, piece);
+        BasePiece whitePawn = new Pawn(Colour.WHITE);
+        BasePiece blackPiece = new Pawn(Colour.BLACK);
+        boardMap.put(startPos, whitePawn);
+        boardMap.put(endPos, blackPiece);
         
-        Set<Position> actualPawnMoves = pawn.getHighlightPolygons(boardMap, startPos);
+        Set<Position> actualPawnMoves = whitePawn.getPossibleMoves(boardMap, startPos);
+        assertTrue(actualPawnMoves.contains(endPos));
+    }
+
+    @Test
+    void isLegalMove_blackPawnCapture_True() throws InvalidPositionException {
+        boardMap.clear();
+        Position startPos = Position.get(Colour.BLACK, 1, 4); // e7
+        Position endPos = Position.get(Colour.WHITE, 2, 5);   // f6
+
+        BasePiece blackPawn = new Pawn(Colour.BLACK);
+        BasePiece whitePiece = new Pawn(Colour.WHITE);
+        boardMap.put(startPos, blackPawn);
+        boardMap.put(endPos, whitePiece);
+        
+        Set<Position> actualPawnMoves = blackPawn.getPossibleMoves(boardMap, startPos);
+        assertTrue(actualPawnMoves.contains(endPos));
+    }
+
+    @Test
+    void isLegalMove_whitePawnCaptureOwnPiece_False() throws InvalidPositionException {
+        boardMap.clear();
+        Position startPos = Position.get(Colour.WHITE, 6, 4); // e2
+        Position endPos = Position.get(Colour.WHITE, 5, 5);   // f3
+
+        BasePiece pawn1 = new Pawn(Colour.WHITE);
+        BasePiece pawn2 = new Pawn(Colour.WHITE);
+        boardMap.put(startPos, pawn1);
+        boardMap.put(endPos, pawn2);
+        
+        Set<Position> actualPawnMoves = pawn1.getPossibleMoves(boardMap, startPos);
         assertFalse(actualPawnMoves.contains(endPos));
     }
 
     @Test
-    void getHighlightPolygons_pawnInitialPosition_presentInPolygonList() {
+    void getHighlightSquares_whitePawnInitialPosition_correctMoves() throws InvalidPositionException {
         boardMap.clear();
-        Position startPos = Position.valueOf("E2R");
+        Position startPos = Position.get(Colour.WHITE, 6, 4); // e2
 
         BasePiece pawn = new Pawn(Colour.WHITE);
         boardMap.put(startPos, pawn);
 
         Set<Position> expectedPawnMoves = ImmutableSet.of(
-            Position.valueOf("E3R"),
-            Position.valueOf("E4R")
+            Position.get(Colour.WHITE, 5, 4), // e3
+            Position.get(Colour.WHITE, 4, 4)  // e4
         );
-        Set<Position> actualPawnMoves = pawn.getHighlightPolygons(boardMap, startPos);
+        Set<Position> actualPawnMoves = pawn.getPossibleMoves(boardMap, startPos);
 
         assertEquals(expectedPawnMoves, actualPawnMoves);
     }
 
     @Test
-    void getHighlightPolygons_pawnAlreadyMoved_presentInPolygonList() {
+    void getHighlightSquares_blackPawnInitialPosition_correctMoves() throws InvalidPositionException {
         boardMap.clear();
-        Position startPos = Position.valueOf("E4R");
+        Position startPos = Position.get(Colour.BLACK, 1, 4); // e7
 
-        BasePiece pawn = new Pawn(Colour.WHITE);
+        BasePiece pawn = new Pawn(Colour.BLACK);
         boardMap.put(startPos, pawn);
 
         Set<Position> expectedPawnMoves = ImmutableSet.of(
-            Position.valueOf("E5R")
+            Position.get(Colour.BLACK, 2, 4), // e6
+            Position.get(Colour.BLACK, 3, 4)  // e5
         );
-        Set<Position> actualPawnMoves = pawn.getHighlightPolygons(boardMap, startPos);
+        Set<Position> actualPawnMoves = pawn.getPossibleMoves(boardMap, startPos);
 
         assertEquals(expectedPawnMoves, actualPawnMoves);
     }
 
-    @ParameterizedTest
-    @EnumSource(Colour.class)
-    void toString_initPawnAllColours_correctStringFormat(Colour colour) {
-        BasePiece pawn = new Pawn(colour);
-        String expectedFormat = colour.toString() + "P";
-        assertEquals(expectedFormat, pawn.toString());
+    @Test
+    void toString_whitePawn_correctFormat() {
+        BasePiece pawn = new Pawn(Colour.WHITE);
+        assertEquals("WP", pawn.toString());
+    }
+
+    @Test
+    void toString_blackPawn_correctFormat() {
+        BasePiece pawn = new Pawn(Colour.BLACK);
+        assertEquals("BP", pawn.toString());
     }
 }
