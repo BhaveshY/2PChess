@@ -16,7 +16,7 @@ RUN chmod +x gradlew
 RUN ./gradlew build --no-daemon  # Avoids creating a Gradle daemon for improved container build consistency
 
 # Stage 2: Run the application
-FROM openjdk:17-jre-slim
+FROM openjdk:17-jdk-slim  # Use the JDK slim version since JRE slim isn't available
 
 # Set the working directory
 WORKDIR /app
