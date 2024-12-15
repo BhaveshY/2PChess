@@ -1,11 +1,6 @@
-# Java Image
-FROM openjdk:8-jdk-slim
+FROM openjdk:8-jre-slim
 
-# copy the webapp.jar to workdir
-COPY webapp/build/libs/webapp.jar webapp.jar
-
-# publish port 8080
+WORKDIR /app
+COPY webapp/build/libs/*.jar app.jar
 EXPOSE 8080
-
-# run java -jar /webapp.jar
-ENTRYPOINT ["java","-jar","/webapp.jar"]
+CMD ["java", "-jar", "app.jar"]

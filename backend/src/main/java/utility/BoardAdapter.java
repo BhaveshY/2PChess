@@ -42,8 +42,8 @@ public class BoardAdapter {
 
         // Set eliminated pieces
         Map<String, List<String>> eliminatedPieces = board.getEliminatedPieces();
-        gameState.setEliminatedWhitePieces(eliminatedPieces.getOrDefault("white", List.of()));
-        gameState.setEliminatedBlackPieces(eliminatedPieces.getOrDefault("black", List.of()));
+        gameState.setEliminatedWhitePieces(eliminatedPieces.getOrDefault("white", Collections.emptyList()));
+        gameState.setEliminatedBlackPieces(eliminatedPieces.getOrDefault("black", Collections.emptyList()));
 
         return gameState;
     }

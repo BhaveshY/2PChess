@@ -2,6 +2,7 @@ package common;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
 
 /**
  * Represents the state of the game, including the board, possible moves, and eliminated pieces.
@@ -23,8 +24,8 @@ public class GameState {
         this.possibleMoves = possibleMoves;
         this.gameOver = false;
         this.winner = null;
-        this.eliminatedWhitePieces = List.of();
-        this.eliminatedBlackPieces = List.of();
+        this.eliminatedWhitePieces = Collections.emptyList();
+        this.eliminatedBlackPieces = Collections.emptyList();
     }
 
     public Map<String, String> getBoard() {
