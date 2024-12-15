@@ -11,7 +11,7 @@ dependencies {
     // Spring Boot starter for web applications
     implementation 'org.springframework.boot:spring-boot-starter-web:3.1.7'
 
-    // Google Guava library
+    // Optional: Include Guava if required
     implementation 'com.google.guava:guava:32.1.2-jre'
 
     // Spring Boot starter for testing (includes JUnit 5)
@@ -24,29 +24,23 @@ java {
     }
 }
 
-
-
 // Configure Spring Boot and Gradle jar tasks
 bootJar {
-    // Set the main class for Spring Boot to run
-    mainClass = 'application.SpringApplication'  // Replace with the actual fully qualified main class
+    mainClass = 'application.SpringApplication'  // Replace with the actual main class
 }
 
 jar {
-    // Exclude duplicate files during packaging
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
     manifest {
-        // Explicitly set the Main-Class attribute for the jar manifest
         attributes 'Main-Class': 'application.SpringApplication'  // Replace with the actual main class
     }
-
-    // Add runtime classpath resources to the jar
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 
+// Test configuration
 test {
-    enabled = false  // Disable tests for faster builds (optional)
+    useJUnitPlatform()
+    enabled = !project.hasProperty('skipTests')  // Skip tests if `-PskipTests` is set
 }
