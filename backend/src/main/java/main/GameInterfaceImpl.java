@@ -2,15 +2,14 @@ package main;
 
 import abstraction.IGameInterface;
 import com.google.common.collect.ImmutableSet;
-import common.Colour;
-import common.InvalidMoveException;
-import common.InvalidPositionException;
-import common.GameState;
-import common.Position;
+import helper.Colour;
+import helper.InvalidMoveException;
+import helper.InvalidPositionException;
+import helper.GameState;
+import helper.Position;
 import model.Board;
 import model.BasePiece;
 
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import utility.BoardAdapter;
 import utility.Log;

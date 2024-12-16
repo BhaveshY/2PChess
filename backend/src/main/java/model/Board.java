@@ -1,10 +1,10 @@
 package model;
 
 import com.google.common.collect.ImmutableSet;
-import common.Colour;
-import common.InvalidMoveException;
-import common.InvalidPositionException;
-import common.Position;
+import helper.Colour;
+import helper.InvalidMoveException;
+import helper.InvalidPositionException;
+import helper.Position;
 import utility.BoardAdapter;
 import utility.Log;
 import utility.PieceFactory;

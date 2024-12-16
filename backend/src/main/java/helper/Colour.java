@@ -1,4 +1,4 @@
-package common;
+package helper;
 
 /**
  * Enum class containing the colors of different players.

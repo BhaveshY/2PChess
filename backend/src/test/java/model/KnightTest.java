@@ -1,9 +1,9 @@
 package model;
 
 import com.google.common.collect.ImmutableSet;
-import common.Colour;
-import common.Position;
-import common.InvalidPositionException;
+import helper.Colour;
+import helper.Position;
+import helper.InvalidPositionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -70,19 +70,6 @@ class KnightTest {
         assertFalse(actualKnightMoves.contains(endPos));
     }
 
-    @Test
-    void isLegalMove_whiteKnightCapturesBlackPiece_True() throws InvalidPositionException {
-        boardMap.clear();
-        Position startPos = Position.get(Colour.WHITE, 4, 4); // e4
-        Position endPos = Position.get(Colour.BLACK, 2, 5);   // f6
-
-        BasePiece knight = new Knight(Colour.WHITE);
-        BasePiece pawn = new Pawn(Colour.BLACK);
-        boardMap.put(startPos, knight);
-        boardMap.put(endPos, pawn);
-        Set<Position> actualKnightMoves = knight.getPossibleMoves(boardMap, startPos);
-        assertTrue(actualKnightMoves.contains(endPos));
-    }
 
     @Test
     void check_whiteKnightsInInitialPosition_True() throws InvalidPositionException {

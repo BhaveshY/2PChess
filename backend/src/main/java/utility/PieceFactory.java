@@ -1,5 +1,5 @@
 package utility;
-import common.Colour;
+import helper.Colour;
 import model.BasePiece;
 import model.Bishop;
 import model.King;

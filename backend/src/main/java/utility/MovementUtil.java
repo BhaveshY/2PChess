@@ -1,8 +1,8 @@
 package utility;
 
-import common.Direction;
-import common.InvalidPositionException;
-import common.Position;
+import helper.Direction;
+import helper.InvalidPositionException;
+import helper.Position;
 import model.BasePiece;
 
 /**

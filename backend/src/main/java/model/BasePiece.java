@@ -1,8 +1,8 @@
 package model;
 
-import common.Colour;
-import common.Direction;
-import common.Position;
+import helper.Colour;
+import helper.Direction;
+import helper.Position;
 
 import java.util.Map;
 import java.util.Set;

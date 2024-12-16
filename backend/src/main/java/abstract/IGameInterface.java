@@ -1,6 +1,6 @@
 package abstraction;
-import common.Colour;
-import common.GameState;
+import helper.Colour;
+import helper.GameState;
 
 public interface IGameInterface {
 

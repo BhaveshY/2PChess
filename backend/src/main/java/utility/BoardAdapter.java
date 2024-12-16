@@ -1,9 +1,9 @@
 package utility;
 
-import common.Colour;
-import common.InvalidPositionException;
-import common.Position;
-import common.GameState;
+import helper.Colour;
+import helper.InvalidPositionException;
+import helper.Position;
+import helper.GameState;
 import model.BasePiece;
 import model.Board;
 
