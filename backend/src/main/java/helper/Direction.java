@@ -1,4 +1,4 @@
-package common;
+package helper;
 
 /**
  *  Enum class containing the Directions for the piece movement

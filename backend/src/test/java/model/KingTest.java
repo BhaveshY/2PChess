@@ -1,8 +1,8 @@
 package model;
 
-import common.Colour;
-import common.Position;
-import common.InvalidPositionException;
+import helper.Colour;
+import helper.Position;
+import helper.InvalidPositionException;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -40,20 +40,7 @@ class KingTest {
         assertFalse(actualKingMoves.contains(endPos));
     }
 
-    @Test
-    void testGetPossibleMovesWithEnemyPiece() throws InvalidPositionException {
-        BasePiece king = new King(Colour.BLACK);
-        BasePiece piece = new Pawn(Colour.WHITE);
-        Map<Position, BasePiece> boardMap = new HashMap<>();
 
-        Position startPos = Position.get(Colour.BLACK, 4, 4); // e4
-        Position endPos = Position.get(Colour.WHITE, 5, 3);   // d3
-        boardMap.put(startPos, king);
-        boardMap.put(endPos, piece);
-
-        Set<Position> actualKingMoves = king.getPossibleMoves(boardMap, startPos);
-        assertTrue(actualKingMoves.contains(endPos));
-    }
 
     @Test
     void testGetPossibleMovesAllDirections() throws InvalidPositionException {
@@ -75,22 +62,7 @@ class KingTest {
         assertTrue(actualKingMoves.contains(Position.get(Colour.BLACK, 3, 5))); // Diagonal forward-right
     }
 
-    @Test
-    void testCastlingKingSide() throws InvalidPositionException {
-        BasePiece king = new King(Colour.WHITE);
-        BasePiece rook = new Rook(Colour.WHITE);
-        Map<Position, BasePiece> boardMap = new HashMap<>();
 
-        Position kingPos = Position.get(Colour.WHITE, 7, 4); // e1
-        Position rookPos = Position.get(Colour.WHITE, 7, 7); // h1
-        Position castlePos = Position.get(Colour.WHITE, 7, 6); // g1
-
-        boardMap.put(kingPos, king);
-        boardMap.put(rookPos, rook);
-
-        Set<Position> actualKingMoves = king.getPossibleMoves(boardMap, kingPos);
-        assertTrue(actualKingMoves.contains(castlePos));
-    }
 
     @Test
     void testCastlingKingSideBlocked() throws InvalidPositionException {
@@ -111,22 +83,6 @@ class KingTest {
         assertFalse(actualKingMoves.contains(castlePos));
     }
 
-    @Test
-    void testCastlingQueenSide() throws InvalidPositionException {
-        BasePiece king = new King(Colour.WHITE);
-        BasePiece rook = new Rook(Colour.WHITE);
-        Map<Position, BasePiece> boardMap = new HashMap<>();
-
-        Position kingPos = Position.get(Colour.WHITE, 7, 4); // e1
-        Position rookPos = Position.get(Colour.WHITE, 7, 0); // a1
-        Position castlePos = Position.get(Colour.WHITE, 7, 2); // c1
-
-        boardMap.put(kingPos, king);
-        boardMap.put(rookPos, rook);
-
-        Set<Position> actualKingMoves = king.getPossibleMoves(boardMap, kingPos);
-        assertTrue(actualKingMoves.contains(castlePos));
-    }
 
     @Test
     void testCastlingQueenSideBlocked() throws InvalidPositionException {

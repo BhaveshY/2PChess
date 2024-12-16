@@ -1,6 +1,6 @@
 package model;
 
-import common.Colour;
+import helper.Colour;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package common;
+package helper;
 
 /**
  *  Class to throw a custom exception for invalid moves

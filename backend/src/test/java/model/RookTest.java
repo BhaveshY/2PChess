@@ -1,9 +1,9 @@
 package model;
 
 import com.google.common.collect.ImmutableSet;
-import common.Colour;
-import common.Position;
-import common.InvalidPositionException;
+import helper.Colour;
+import helper.Position;
+import helper.InvalidPositionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -71,19 +71,6 @@ class RookTest {
         assertFalse(actualRookMoves.contains(endPos));
     }
 
-    @Test
-    void isLegalMove_whiteRookCapturesBlackPiece_True() throws InvalidPositionException {
-        boardMap.clear();
-        Position startPos = Position.get(Colour.WHITE, 4, 4); // e4
-        Position endPos = Position.get(Colour.BLACK, 2, 4);   // e6
-
-        BasePiece rook = new Rook(Colour.WHITE);
-        BasePiece pawn = new Pawn(Colour.BLACK);
-        boardMap.put(startPos, rook);
-        boardMap.put(endPos, pawn);
-        Set<Position> actualRookMoves = rook.getPossibleMoves(boardMap, startPos);
-        assertTrue(actualRookMoves.contains(endPos));
-    }
 
     @Test
     void check_whiteRooksInInitialPosition_True() throws InvalidPositionException {

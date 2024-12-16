@@ -1,4 +1,4 @@
-package common;
+package helper;
 
 /**
  * Class containing the positions enums of the chess board

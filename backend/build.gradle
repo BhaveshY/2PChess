@@ -14,7 +14,8 @@ dependencies {
     // Google Guava library
     implementation 'com.google.guava:guava:32.1.2-jre'
 
-  
+    testImplementation 'org.mockito:mockito-core:4.0.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.0.0'
 
     // Spring Boot starter for testing (includes JUnit 5)
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.1.7'
@@ -25,8 +26,6 @@ java {
         languageVersion = JavaLanguageVersion.of(17)
     }
 }
-
-
 
 // Configure Spring Boot and Gradle jar tasks
 bootJar {
@@ -50,5 +49,13 @@ jar {
 }
 
 test {
-    enabled = false  // Disable tests for faster builds (optional)
+    useJUnitPlatform()  // Enable if you're using JUnit 5
+
+    // Configure test report generation
+    reports {
+        junitXml {
+            destination = file("$buildDir/test-results/test")  // Set the destination for XML reports
+            // By default, JUnit XML report generation is enabled, so no need to explicitly set 'enabled'
+        }
+    }
 }

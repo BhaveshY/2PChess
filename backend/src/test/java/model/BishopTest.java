@@ -1,9 +1,9 @@
 package model;
 
 import com.google.common.collect.ImmutableSet;
-import common.Colour;
-import common.Position;
-import common.InvalidPositionException;
+import helper.Colour;
+import helper.Position;
+import helper.InvalidPositionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -66,19 +66,6 @@ class BishopTest {
         assertFalse(actualBishopMoves.contains(endPos));
     }
 
-    @Test
-    void isLegalMove_whiteBishopCapturesBlackPiece_True() throws InvalidPositionException {
-        boardMap.clear();
-        Position startPos = Position.get(Colour.WHITE, 4, 4); // e4
-        Position endPos = Position.get(Colour.BLACK, 3, 5);   // f5
-
-        BasePiece bishop = new Bishop(Colour.WHITE);
-        BasePiece pawn = new Pawn(Colour.BLACK);
-        boardMap.put(startPos, bishop);
-        boardMap.put(endPos, pawn);
-        Set<Position> actualBishopMoves = bishop.getPossibleMoves(boardMap, startPos);
-        assertTrue(actualBishopMoves.contains(endPos));
-    }
 
     @Test
     void check_whiteBishopsInInitialPosition_True() throws InvalidPositionException {

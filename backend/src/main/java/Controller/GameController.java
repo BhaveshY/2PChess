@@ -1,7 +1,7 @@
 package application.controller;
 
 import abstraction.IGameInterface;
-import common.GameState;
+import helper.GameState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

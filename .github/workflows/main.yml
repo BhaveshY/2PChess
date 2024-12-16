@@ -36,7 +36,6 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-
       # 4. Build the application with Gradle
       - name: Build with Gradle
         run: ./gradlew build --no-daemon
@@ -60,7 +59,6 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/jchess_application:latest .
-
       # 9. Push Docker Image to Docker Hub
       - name: Push Docker Image
         run: |
