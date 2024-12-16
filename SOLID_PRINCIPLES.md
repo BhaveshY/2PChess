@@ -9,11 +9,11 @@
    - Open for extension, closed for modification
    - Example: Add new features through new classes, don't modify existing ones
      
-3. **Dependency Injection Principle**
+3. **Dependency Injection Principle (D)**
     - Injects external dependencies into a class
     - Example: Injecting a service into a controller class
 
-4. **Law of Demeter**
+4. **Law of Demeter (L)**
    - Objects should only talk to their immediate friends
    - Example: A class should only call methods of its own fields        
      
