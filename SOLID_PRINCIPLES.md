@@ -2,7 +2,7 @@
 
 ## Change Log
 
-### 2024-01-XX: MovementUtil Refactoring
+### : MovementUtil Refactoring
 - Fixed: Removed calls to undefined `neighbour()` method in MovementUtil
 - Changed: Replaced with direct calls to `Position.move(Direction[] step)`
 - Before:
@@ -90,3 +90,16 @@ MovementUtil.java was refactored to:
 - For LSP examples: Search for `[LSP]`
 - For ISP examples: Search for `[ISP]`
 - For DIP examples: Search for `[DIP]`
+
+
+
+Current Composition Examples:
+Board class uses composition with:
+Map<Position, BasePiece> boardMap
+Set<Position> highlightPolygons
+Map<Colour, List<BasePiece>> eliminatedPieces
+
+CompositionPiece class (which we created earlier) uses composition with:
+PieceMovementHandler for movement logic
+String symbol for piece representation
+int value for piece value
