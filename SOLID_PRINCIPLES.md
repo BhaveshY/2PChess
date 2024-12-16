@@ -1,8 +1,45 @@
 # SOLID Principles Implementation Reference
 
+## Simple SOLID Explanations
+1. **Single Responsibility (S)**
+   - One class should do one thing
+   - Example: A logger class should only handle logging, not business logic
+
+2. **Open/Closed (O)**
+   - Open for extension, closed for modification
+   - Example: Add new features through new classes, don't modify existing ones
+
+3. **Liskov Substitution (L)**
+   - Child classes should work wherever parent classes are used
+   - Example: A Square class should work anywhere a Rectangle class is expected
+
+4. **Interface Segregation (I)**
+   - Keep interfaces small and focused
+   - Example: Split large interfaces into smaller, specific ones
+
+5. **Dependency Inversion (D)**
+   - Depend on abstractions, not concrete implementations
+   - Example: Use interfaces instead of specific classes
+
+## Our Recent Changes Explained
+1. **MovementUtil Refactoring**
+   - What: Fixed broken `neighbour()` method calls
+   - How: Used existing `move()` method instead
+   - Why: Simpler code, same functionality
+
+2. **Information Hiding**
+   - What: Made Board class internals private
+   - How: Added proper getters/setters, made collections unmodifiable
+   - Why: Better encapsulation, safer code
+
+3. **Composition Over Inheritance**
+   - What: Created MovablePiece using composition
+   - How: Used strategy pattern instead of inheritance
+   - Why: More flexible piece behavior
+
 ## Change Log
 
-### : MovementUtil Refactoring
+### MovementUtil Refactoring
 - Fixed: Removed calls to undefined `neighbour()` method in MovementUtil
 - Changed: Replaced with direct calls to `Position.move(Direction[] step)`
 - Before:
