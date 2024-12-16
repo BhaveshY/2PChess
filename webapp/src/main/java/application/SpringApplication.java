@@ -3,8 +3,7 @@ package application;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
-@ComponentScan(basePackages = "abstraction")
-@ComponentScan(basePackages = "main")
+@ComponentScan(basePackages = "service")
 @ComponentScan(basePackages = "application.controller")
 /**
  * SpringBootApplication - web application

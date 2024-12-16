@@ -4,8 +4,8 @@ import helper.Colour;
 import helper.InvalidPositionException;
 import helper.Position;
 import helper.GameState;
-import model.BasePiece;
-import model.Board;
+import entity.BasePiece;
+import entity.Board;
 
 import java.util.ArrayList;
 import java.util.Collections;

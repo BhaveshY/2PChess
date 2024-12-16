@@ -1,4 +1,4 @@
-package model;
+package entity;
 
 import helper.Colour;
 import helper.Direction;
@@ -9,7 +9,7 @@ import java.util.Set;
 
 /**
  *  Abstract Base class for all chess pieces. All chess pieces must extend this class
- *  and provide implementation to abstract methods according to their rules.
+ *  and provide implementation to service methods according to their rules.
  **/
 public abstract class BasePiece {
 

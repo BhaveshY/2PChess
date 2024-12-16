@@ -1,4 +1,4 @@
-package model;
+package entity;
 
 import helper.Colour;
 import helper.Direction;
@@ -12,19 +12,20 @@ import java.util.Set;
 import static utility.MovementUtil.stepOrNull;
 
 /**
- * Bishop class extends BasePiece. Move directions for the bishop, the polygons
+ * Rook class extends BasePiece. Move directions for the Rook, the polygons
  * to be highlighted, and its legal moves are checked here
  **/
-public class Bishop extends BasePiece {
+public class Rook extends BasePiece {
 
-    private static final String TAG = "BISHOP";
+    private static final String TAG = "ROOK";
 
     /**
-     * Bishop constructor
+     * Rook constructor
      * @param colour: Colour of the chess piece being initiated
      * */
-    public Bishop(Colour colour) {
+    public Rook(Colour colour) {
         super(colour);
+        setupDirections();
     }
 
     /**
@@ -33,10 +34,10 @@ public class Bishop extends BasePiece {
     @Override
     protected void setupDirections() {
         this.directions = new Direction[][] {
-                {Direction.FORWARD, Direction.LEFT},
-                {Direction.FORWARD, Direction.RIGHT},
-                {Direction.BACKWARD, Direction.LEFT},
-                {Direction.BACKWARD, Direction.RIGHT}
+                {Direction.BACKWARD},
+                {Direction.LEFT},
+                {Direction.RIGHT},
+                {Direction.FORWARD}
         };
     }
 
@@ -73,6 +74,6 @@ public class Bishop extends BasePiece {
      * */
     @Override
     public String toString() {
-        return this.colour.toString() + "B";
+        return this.colour.toString() + "R";
     }
 }

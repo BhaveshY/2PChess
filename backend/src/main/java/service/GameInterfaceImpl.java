@@ -1,14 +1,13 @@
-package main;
+package service;
 
-import abstraction.IGameInterface;
 import com.google.common.collect.ImmutableSet;
 import helper.Colour;
 import helper.InvalidMoveException;
 import helper.InvalidPositionException;
 import helper.GameState;
 import helper.Position;
-import model.Board;
-import model.BasePiece;
+import entity.Board;
+import entity.BasePiece;
 
 import org.springframework.stereotype.Service;
 import utility.BoardAdapter;

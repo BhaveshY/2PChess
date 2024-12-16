@@ -1,4 +1,4 @@
-package model;
+package entity;
 
 import com.google.common.collect.ImmutableSet;
 import helper.Colour;

@@ -1,4 +1,4 @@
-package abstraction;
+package service;
 import helper.Colour;
 import helper.GameState;
 

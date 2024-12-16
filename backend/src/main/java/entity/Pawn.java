@@ -1,4 +1,4 @@
-package model;
+package entity;
 
 import helper.Colour;
 import helper.Direction;

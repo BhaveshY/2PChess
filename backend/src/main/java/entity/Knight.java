@@ -1,4 +1,4 @@
-package model;
+package entity;
 
 import helper.Colour;
 import helper.Direction;
@@ -12,20 +12,19 @@ import java.util.Set;
 import static utility.MovementUtil.stepOrNull;
 
 /**
- * Rook class extends BasePiece. Move directions for the Rook, the polygons
+ * Knight class extends BasePiece. Move directions for the Knight, the polygons
  * to be highlighted, and its legal moves are checked here
  **/
-public class Rook extends BasePiece {
+public class Knight extends BasePiece {
 
-    private static final String TAG = "ROOK";
+    private static final String TAG = "KNIGHT";
 
     /**
-     * Rook constructor
+     * Knight constructor
      * @param colour: Colour of the chess piece being initiated
      * */
-    public Rook(Colour colour) {
+    public Knight(Colour colour) {
         super(colour);
-        setupDirections();
     }
 
     /**
@@ -34,16 +33,20 @@ public class Rook extends BasePiece {
     @Override
     protected void setupDirections() {
         this.directions = new Direction[][] {
-                {Direction.BACKWARD},
-                {Direction.LEFT},
-                {Direction.RIGHT},
-                {Direction.FORWARD}
+                {Direction.FORWARD, Direction.FORWARD, Direction.LEFT},
+                {Direction.FORWARD, Direction.FORWARD, Direction.RIGHT},
+                {Direction.BACKWARD, Direction.BACKWARD, Direction.LEFT},
+                {Direction.BACKWARD, Direction.BACKWARD, Direction.RIGHT},
+                {Direction.LEFT, Direction.LEFT, Direction.FORWARD},
+                {Direction.LEFT, Direction.LEFT, Direction.BACKWARD},
+                {Direction.RIGHT, Direction.RIGHT, Direction.FORWARD},
+                {Direction.RIGHT, Direction.RIGHT, Direction.BACKWARD}
         };
     }
 
     /**
      * Fetch all the possible positions where a piece can move on board
-     * @param boardMap: Board Map instance representing current game board
+     * @param boardMap: Board class instance representing current game board
      * @param start: position of piece on board
      * @return Set of possible positions a piece is allowed to move
      * */
@@ -54,14 +57,15 @@ public class Rook extends BasePiece {
         Direction[][] steps = this.directions;
 
         for (Direction[] step : steps) {
-            Position tmp = stepOrNull(mover, step, start);
-            while (tmp != null && !positionSet.contains(tmp) && (boardMap.get(tmp) == null || boardMap.get(tmp).getColour() != mover.getColour())) {
-                Log.d(TAG, "tmp: " + tmp);
-                positionSet.add(tmp);
-                if (boardMap.get(tmp) != null && boardMap.get(tmp).getColour() != mover.getColour()) {
-                    break;
+            Position end = stepOrNull(mover, step, start);
+
+            if (end != null) {
+                BasePiece target = boardMap.get(end);
+
+                if (target == null || target.getColour() != mover.getColour()) {
+                    Log.d(TAG, "position: " + end);
+                    positionSet.add(end);
                 }
-                tmp = stepOrNull(mover, step, tmp);
             }
         }
 
@@ -74,6 +78,6 @@ public class Rook extends BasePiece {
      * */
     @Override
     public String toString() {
-        return this.colour.toString() + "R";
+        return this.colour.toString() + "N";
     }
 }

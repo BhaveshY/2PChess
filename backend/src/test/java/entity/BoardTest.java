@@ -1,4 +1,4 @@
-package model;
+package entity;
 
 import helper.Colour;
 import helper.InvalidMoveException;
@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 

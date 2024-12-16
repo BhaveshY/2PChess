@@ -1,16 +1,14 @@
 package main;
 
 import helper.*;
-import model.Board;
-import model.BasePiece;
+import entity.Board;
+import entity.BasePiece;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.util.Map;
-import java.util.Set;
+import service.GameInterfaceImpl;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;

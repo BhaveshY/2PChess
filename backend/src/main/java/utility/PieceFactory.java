@@ -1,12 +1,12 @@
 package utility;
 import helper.Colour;
-import model.BasePiece;
-import model.Bishop;
-import model.King;
-import model.Knight;
-import model.Pawn;
-import model.Queen;
-import model.Rook;
+import entity.BasePiece;
+import entity.Bishop;
+import entity.King;
+import entity.Knight;
+import entity.Pawn;
+import entity.Queen;
+import entity.Rook;
 
 /**
  * PieceFactory - helper class to create objects chess pieces

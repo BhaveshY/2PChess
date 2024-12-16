@@ -3,7 +3,7 @@ package utility;
 import helper.Direction;
 import helper.InvalidPositionException;
 import helper.Position;
-import model.BasePiece;
+import entity.BasePiece;
 
 /**
  * MovementUtil - helper class for the movement of chess pieces
