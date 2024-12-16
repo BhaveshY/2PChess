@@ -1,0 +1,65 @@
+@startuml
+participant GameMain
+participant GameState
+->GameMain: OnClick
+activate GameMain
+alt first click
+GameMain->BoardAdapter: calculatePolygonID
+activate BoardAdapter
+BoardAdapter-->GameMain: polygon position
+deactivate BoardAdapter
+GameMain->Board: isCurrentPlayersPiece
+activate Board
+Board-->GameMain: return true/ false
+deactivate Board
+GameMain->Board: getPossibleMoves
+activate Board
+Board->BasePiece: getHighlightPolygons
+activate BasePiece
+BasePiece->BasePiece: getWallPieceMapping
+BasePiece->MovementUtil: stepOrNull
+note right: checks for \neach direction
+activate MovementUtil
+BasePiece<--MovementUtil: Position
+deactivate MovementUtil
+Board<--BasePiece: List<Position>
+deactivate BasePiece
+GameMain<--Board: List<Position> highlight polygons
+deactivate Board
+else second click
+GameMain->Board: move
+activate Board
+Board->Board: isLegalMove
+Board->Board: isCheck
+activate Board
+Board->BasePiece: getHighlightPolygons
+activate BasePiece
+BasePiece->BasePiece: getWallPieceMapping
+BasePiece->MovementUtil: stepOrNull
+note right: checks for \neach direction
+activate MovementUtil
+BasePiece<--MovementUtil: Position
+deactivate MovementUtil
+note left: checks if king \nis present in \nhighlight polygons
+Board<--BasePiece: List<Position>
+deactivate Board
+deactivate BasePiece
+Board->Board: isCheckAfterLegalMove
+note right: internally use isCheck\n returns nothing
+Board->Board: isCheckMate
+deactivate Board
+end
+GameMain->BoardAdapter: convertHighlightPolygonsToViewBoard
+GameMain<--BoardAdapter: List<String> highlight Polygons
+alt Game over
+GameMain->Board: isGameOver
+activate Board
+GameMain<--Board: game status
+deactivate Board
+GameMain->GameState: setGameOver
+activate GameState
+deactivate GameState
+else Not yet
+end
+<--GameMain: click Response
+@enduml
