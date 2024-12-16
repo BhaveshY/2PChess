@@ -31,13 +31,19 @@ public class King extends BasePiece {
      * */
     public King(Colour colour) {
         super(colour);
-        castlingPositionMapping = new HashMap<>();
+        initializeCastlingPositions();
+    }
 
+    /**
+     * Initialize valid castling end positions for each color
+     */
+    private void initializeCastlingPositions() {
+        castlingPositionMapping = new HashMap<>();
         try {
             for (Colour c : Colour.values()) {
                 List<Position> castlingPositions = castlingPositionMapping.getOrDefault(c, new ArrayList<>());
-                castlingPositions.add(Position.get(c, 0, 6));
-                castlingPositions.add(Position.get(c, 0, 2));
+                castlingPositions.add(Position.get(c, 0, 6)); // King-side castling
+                castlingPositions.add(Position.get(c, 0, 2)); // Queen-side castling
                 castlingPositionMapping.put(c, castlingPositions);
             }
         } catch (InvalidPositionException e) {
@@ -64,6 +70,94 @@ public class King extends BasePiece {
                 {Direction.LEFT},
                 {Direction.RIGHT}
         };
+    }
+
+    /**
+     * Method to check if castling is possible between given positions
+     * @param board: Board class instance representing current game board
+     * @param start: start position of piece on board
+     * @param end: end position of piece on board
+     * @return bool if castling is possible
+     */
+    private boolean isCastlingPossible(Map<Position, BasePiece> board, Position start, Position end) {
+        Log.d(TAG, "isCastlingPossible: start: " + start + ", end: " + end);
+        
+        if (!isKingInStartPosition(start)) {
+            return false;
+        }
+        
+        return isKingSideCastlingPossible(board, end) || isQueenSideCastlingPossible(board, end);
+    }
+
+    /**
+     * Check if king is in its initial position
+     */
+    private boolean isKingInStartPosition(Position start) {
+        try {
+            return start.equals(Position.get(getColour(), 0, 4));
+        } catch (InvalidPositionException e) {
+            Log.e(TAG, "Error checking king position: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Check if king-side castling is possible
+     */
+    private boolean isKingSideCastlingPossible(Map<Position, BasePiece> board, Position end) {
+        try {
+            if (!end.equals(Position.get(getColour(), 0, 6))) {
+                return false;
+            }
+            
+            Position rookPos = Position.get(getColour(), 0, 7);
+            Position empty1Pos = Position.get(getColour(), 0, 5);
+            Position empty2Pos = Position.get(getColour(), 0, 6);
+            
+            return isCastlingPathClear(board, rookPos, empty1Pos, empty2Pos);
+        } catch (InvalidPositionException e) {
+            Log.e(TAG, "Error checking king-side castling: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Check if queen-side castling is possible
+     */
+    private boolean isQueenSideCastlingPossible(Map<Position, BasePiece> board, Position end) {
+        try {
+            if (!end.equals(Position.get(getColour(), 0, 2))) {
+                return false;
+            }
+            
+            Position rookPos = Position.get(getColour(), 0, 0);
+            Position empty1Pos = Position.get(getColour(), 0, 1);
+            Position empty2Pos = Position.get(getColour(), 0, 2);
+            Position empty3Pos = Position.get(getColour(), 0, 3);
+            
+            return isCastlingPathClear(board, rookPos, empty1Pos, empty2Pos, empty3Pos);
+        } catch (InvalidPositionException e) {
+            Log.e(TAG, "Error checking queen-side castling: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Check if the path for castling is clear and rook is present
+     */
+    private boolean isCastlingPathClear(Map<Position, BasePiece> board, Position rookPos, Position... emptyPositions) {
+        BasePiece rook = board.get(rookPos);
+        if (!(rook instanceof Rook) || rook.getColour() != getColour()) {
+            return false;
+        }
+        
+        for (Position pos : emptyPositions) {
+            if (board.get(pos) != null) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     /**
@@ -98,51 +192,9 @@ public class King extends BasePiece {
     }
 
     /**
-     * Method to check if castling is possible between given positions
-     * @param board: Board class instance representing current game board
-     * @param start: start position of piece on board
-     * @param end: start position of piece on board
-     * @return bool if castling is possible
-     * */
-    private boolean isCastlingPossible(Map<Position, BasePiece> board, Position start, Position end) {
-        Log.d(TAG, "isCastlingPossible: start: " + start + ", end: " + end);
-        BasePiece mover = this;
-        Colour moverCol = mover.getColour();
-        try {
-            if (start.equals(Position.get(moverCol, 0, 4))) {
-                if (end.equals(Position.get(moverCol, 0, 6))) {
-                    BasePiece castle = board.get(Position.get(moverCol, 0, 7));
-                    BasePiece empty1 = board.get(Position.get(moverCol, 0, 5));
-                    BasePiece empty2 = board.get(Position.get(moverCol, 0, 6));
-                    if (castle instanceof Rook && castle.getColour() == mover.getColour()
-                            && empty1 == null && empty2 == null) {
-                        Log.d(TAG, "Castling Legal Move 1: True");
-                        return true;
-                    }
-                }
-                if (end.equals(Position.get(moverCol, 0, 2))) {
-                    BasePiece castle = board.get(Position.get(moverCol, 0, 0));
-                    BasePiece empty1 = board.get(Position.get(moverCol, 0, 1));
-                    BasePiece empty2 = board.get(Position.get(moverCol, 0, 2));
-                    BasePiece empty3 = board.get(Position.get(moverCol, 0, 3));
-                    if (castle instanceof Rook && castle.getColour() == mover.getColour()
-                            && empty1 == null && empty2 == null && empty3 == null) {
-                        Log.d(TAG, "Castling Legal Move 2: True");
-                        return true;
-                    }
-                }
-            }
-        } catch (InvalidPositionException e) {
-            // do nothing, steps went off board.
-            Log.e(TAG, "InvalidPositionException: " + e.getMessage());
-        }
-        return false;
-    }
-
-    /**
      * Returns custom string representation of the class
      * @return String
-     * */
+     */
     @Override
     public String toString() {
         return this.colour.toString() + "K";

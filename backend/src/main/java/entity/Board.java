@@ -367,14 +367,35 @@ public class Board {
         Position finalPos = null;
         try {
             finalPos = Position.get(mover.getColour(), end.getRow(), end.getColumn());
-            if (mover instanceof Pawn && end.getRow() == (mover.getColour() == Colour.WHITE ? 0 : 7)) {
-                boardMap.put(finalPos, new Queen(mover.getColour()));
+            if (shouldPromotePawn(mover, end)) {
+                boardMap.put(finalPos, createPromotedPiece(mover));
             } else {
                 boardMap.put(finalPos, mover);
             }
         } catch (InvalidPositionException e) {
             Log.e(TAG, "Error updating board state: " + e.getMessage());
         }
+    }
+
+    /**
+     * Check if a piece should be promoted (pawn reaching opposite end)
+     */
+    private boolean shouldPromotePawn(BasePiece piece, Position position) {
+        return piece instanceof Pawn && isPromotionRank(piece.getColour(), position.getRow());
+    }
+
+    /**
+     * Check if a row is the promotion rank for a given color
+     */
+    private boolean isPromotionRank(Colour colour, int row) {
+        return row == (colour == Colour.WHITE ? 0 : 7);
+    }
+
+    /**
+     * Create a promoted piece (currently always promotes to Queen)
+     */
+    private BasePiece createPromotedPiece(BasePiece original) {
+        return new Queen(original.getColour());
     }
 
     private void handleSpecialMoves(Position start, Position end, BasePiece mover) {

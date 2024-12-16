@@ -43,10 +43,7 @@ public class MovementUtil {
      * @throws InvalidPositionException if any step would move off the board
      */
     public static Position step(BasePiece piece, Direction[] step, Position current) throws InvalidPositionException {
-        for(Direction d: step) {
-            current = current.neighbour(d);
-        }
-        return current;
+        return current.move(step);
     }
 
     /**
@@ -64,10 +61,7 @@ public class MovementUtil {
      * @throws InvalidPositionException if any step would move off the board
      */
     public static Position step(BasePiece piece, Direction[] step, Position current, boolean reverse) throws InvalidPositionException {
-        for(Direction d: step) {
-            current = current.neighbour(d);
-        }
-        return current;
+        return current.move(step);
     }
 
     /**
