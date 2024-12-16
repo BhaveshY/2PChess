@@ -1,5 +1,5 @@
-# 3-Player-Chess
-Three Player chess game  using a Spring Boot web application
+# 2-Player-Chess
+Two Player chess game  using a Spring Boot web application
 
 ## Project Structure
 The project consists of 3 different Modules:
