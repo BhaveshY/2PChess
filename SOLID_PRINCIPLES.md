@@ -18,6 +18,24 @@ Search for: `[LSP]`
 - MoveValidator.java - Line 54: Works with any Board implementation
 - BasePiece.java - Entire class ensures substitutability of chess pieces
 
+LSP Violation Example:
+- IGameInterface.getBoard() violates LSP by:
+  1. Method name suggests returning board data but returns full GameState
+  2. Behavioral contract doesn't match method name
+  3. Client code expecting board data might break with substitute implementations
+  4. GameController shows confusion with duplicate endpoints using same method
+
+Fix: Either rename to getGameState() or split interface:
+```java
+public interface IBoardView {
+    Map<String, String> getBoard();  // Just board data
+}
+
+public interface IGameState extends IBoardView {
+    GameState getFullGameState();  // Complete state
+}
+```
+
 ## Interface Segregation Principle (ISP)
 Search for: `[ISP]`
 - MoveValidator.java - Line 36: Method uses minimal required interfaces
