@@ -49,6 +49,9 @@ jar {
 }
 
 test {
-    useJUnitPlatform()
-    enabled = true  // Ensure tests are enabled
+    useJUnitPlatform()  // Enable if you're using JUnit 5
+    reports {
+        junitXml.enabled = true  // Enable JUnit XML reports
+        html.enabled = false     // Disable HTML reports (optional)
+    }
 }
