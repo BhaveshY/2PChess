@@ -1,5 +1,5 @@
 # Stage 1: Build the application using OpenJDK 17
-FROM openjdk:17-jdk AS build
+FROM openjdk:8-jdk AS build
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ RUN chmod +x gradlew
 RUN ./gradlew build
 
 # Stage 2: Run the application using OpenJDK 17
-FROM openjdk:17-jre
+FROM openjdk:8-jre
 
 WORKDIR /app
 
