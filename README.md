@@ -2,7 +2,7 @@
 Two Player chess game  using a Spring Boot web application
 
 ## Project Structure
-The project consists of 3 different Modules:
+The project consists of 2 different Modules:
 1. webapp: This module contains the Spring web application
 2. backend: This module contains the entire game logic for two player chess
 
