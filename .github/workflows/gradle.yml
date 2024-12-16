@@ -27,15 +27,6 @@ jobs:
     - name: Build backend and webapp
       run: ./gradlew clean build
 
-    - name: Run unit tests
-      run: ./gradlew test  # Run unit tests and generate results in JUnit format
-
-    - name: Upload JUnit Test Results as Artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: junit-test-results
-        path: build/test-results/test/*.xml  # Path to the test results
-
     - name: Package webapp as JAR
       run: ./gradlew :webapp:bootJar
         
