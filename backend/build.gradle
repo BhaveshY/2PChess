@@ -57,6 +57,5 @@ test {
             destination = file("$buildDir/test-results/test")  // Set the destination for XML reports
             // By default, JUnit XML report generation is enabled, so no need to explicitly set 'enabled'
         }
-        html.enabled = false  // Disable HTML reports (optional)
     }
 }
