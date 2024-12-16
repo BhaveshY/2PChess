@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+import java.util.Collections;
 
 /**
  * Represents the chess game board and manages game state.
@@ -44,7 +45,7 @@ public class Board {
     private static final String TAG = "Board";
 
     /** Maps positions to pieces on the board */
-    protected Map<Position, BasePiece> boardMap;
+    private final Map<Position, BasePiece> boardMap;
     
     /** Current player's turn */
     private Colour turn;
@@ -56,13 +57,10 @@ public class Board {
     private String winner;
     
     /** Currently highlighted squares */
-    private Set<Position> highlightPolygons = new HashSet<>();
+    private final Set<Position> highlightPolygons;
     
-    /** List of eliminated white pieces */
-    private List<BasePiece> eliminatedWhitePieces = new ArrayList<>();
-    
-    /** List of eliminated black pieces */
-    private List<BasePiece> eliminatedBlackPieces = new ArrayList<>();
+    /** List of eliminated pieces by color */
+    private final Map<Colour, List<BasePiece>> eliminatedPieces;
 
     /**
      * Creates a new chess board with initial piece setup.
@@ -74,11 +72,18 @@ public class Board {
      *   <li>Places all pieces in starting positions</li>
      * </ul>
      */
+
+     // Information Hiding Principle
     public Board() {
-        boardMap = new HashMap<>();
-        turn = Colour.WHITE;
-        gameOver = false;
-        winner = null;
+        this.boardMap = new HashMap<>();
+        this.turn = Colour.WHITE;
+        this.gameOver = false;
+        this.winner = null;
+        this.highlightPolygons = new HashSet<>();
+        this.eliminatedPieces = new HashMap<>();
+        this.eliminatedPieces.put(Colour.WHITE, new ArrayList<>());
+        this.eliminatedPieces.put(Colour.BLACK, new ArrayList<>());
+        
         try {
             placeChessPieces(Colour.WHITE);
             placeChessPieces(Colour.BLACK);
@@ -263,7 +268,7 @@ public class Board {
             return ImmutableSet.of();
         }
 
-        highlightPolygons = mover.getPossibleMoves(this.boardMap, position);
+        setHighlightedSquares(mover.getPossibleMoves(this.boardMap, position));
         return filterCheckMoves(position, mover);
     }
 
@@ -283,19 +288,19 @@ public class Board {
      * @return Map of color to list of eliminated pieces
      */
     public Map<String, List<String>> getEliminatedPieces() {
-        Map<String, List<String>> eliminatedPieces = new HashMap<>();
+        Map<String, List<String>> result = new HashMap<>();
         
-        eliminatedPieces.put("white", 
-            eliminatedWhitePieces.stream()
+        result.put("white", 
+            eliminatedPieces.get(Colour.WHITE).stream()
                 .map(BasePiece::toString)
                 .collect(Collectors.toList()));
         
-        eliminatedPieces.put("black", 
-            eliminatedBlackPieces.stream()
+        result.put("black", 
+            eliminatedPieces.get(Colour.BLACK).stream()
                 .map(BasePiece::toString)
                 .collect(Collectors.toList()));
         
-        return eliminatedPieces;
+        return result;
     }
 
     /**
@@ -304,7 +309,21 @@ public class Board {
      * @return Map of positions to pieces
      */
     public Map<Position, BasePiece> getBoardMap() {
-        return boardMap;
+        return Collections.unmodifiableMap(boardMap);
+    }
+
+    public void setBoardMap(Map<Position, BasePiece> newBoardMap) {
+        boardMap.clear();
+        boardMap.putAll(newBoardMap);
+    }
+
+    public Set<Position> getHighlightedSquares() {
+        return Collections.unmodifiableSet(highlightPolygons);
+    }
+
+    private void setHighlightedSquares(Set<Position> positions) {
+        highlightPolygons.clear();
+        highlightPolygons.addAll(positions);
     }
 
     // Private helper methods...
@@ -353,11 +372,7 @@ public class Board {
 
     private void handleCapture(BasePiece targetPiece, Position targetPos) {
         if (targetPiece != null) {
-            if (targetPiece.getColour() == Colour.WHITE) {
-                eliminatedWhitePieces.add(targetPiece);
-            } else {
-                eliminatedBlackPieces.add(targetPiece);
-            }
+            eliminatedPieces.get(targetPiece.getColour()).add(targetPiece);
             boardMap.remove(targetPos);
         }
     }
