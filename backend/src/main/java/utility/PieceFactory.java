@@ -9,16 +9,47 @@ import entity.Queen;
 import entity.Rook;
 
 /**
- * PieceFactory - helper class to create objects chess pieces
- **/
+ * Factory class for creating chess pieces.
+ * 
+ * <p>This class implements the Factory design pattern to centralize
+ * chess piece creation. It provides a single point of control for:
+ * <ul>
+ *   <li>Piece instantiation</li>
+ *   <li>Type validation</li>
+ *   <li>Color assignment</li>
+ * </ul>
+ * 
+ * <p>The factory supports creating all standard chess pieces:
+ * <ul>
+ *   <li>King</li>
+ *   <li>Queen</li>
+ *   <li>Bishop</li>
+ *   <li>Knight</li>
+ *   <li>Rook</li>
+ *   <li>Pawn</li>
+ * </ul>
+ * 
+ * @see BasePiece
+ * @see Colour
+ * @version 1.0
+ */
 public class PieceFactory {
 
     /**
-     * createPiece - based on the type and colour, creates a chess piece
-     * @param colour - piece colour
-     * @param type - piece name e.g. king
-     * @return BasePiece
-     **/
+     * Creates a new chess piece of the specified type and color.
+     * 
+     * <p>This method:
+     * <ul>
+     *   <li>Validates the piece type</li>
+     *   <li>Creates the appropriate piece instance</li>
+     *   <li>Initializes it with the specified color</li>
+     * </ul>
+     * 
+     * @param type Type of piece to create ("king", "queen", etc.)
+     * @param colour Color of the piece
+     * @return New chess piece instance
+     * @throws IllegalArgumentException if the piece type is invalid
+     */
     public static BasePiece createPiece(String type, Colour colour) {
         switch (type.toLowerCase()) {
             case "bishop":

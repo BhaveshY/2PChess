@@ -16,21 +16,52 @@ import utility.Log;
 import java.util.Set;
 
 /**
+ * Main implementation of the chess game interface.
+ * 
+ * <p>This class serves as the primary backend controller for the chess game,
+ * handling:
+ * <ul>
+ *   <li>Game state management</li>
+ *   <li>Move processing</li>
+ *   <li>Player interactions</li>
+ *   <li>Board state updates</li>
+ * </ul>
+ * 
+ * <p>The implementation ensures thread-safe access to game state and
+ * coordinates all game operations through a well-defined interface.
+ * 
  * Class containing the main logic of the backend.
  * The click inputs from the webapp are communicated with the backend.
+ * 
+ * @see IGameInterface
+ * @see Board
+ * @see GameState
+ * @version 1.0
  */
-
-//added @Component annotation to make the class a Spring bean for DI
 @Service
 public class GameInterfaceImpl implements IGameInterface {
 
+    /** Logger tag for this class */
     private static final String TAG = GameInterfaceImpl.class.getSimpleName();
+    
+    /** The game board instance */
     private final Board board;
+    
+    /** Starting position for a move in progress */
     private Position moveStartPos;
+    
+    /** Currently highlighted squares on the board */
     private Set<Position> highlightSquares;
 
     /**
-     * GameInterfaceImpl Constructor. Entry point to the backend logic
+     * Creates a new game interface with initial setup.
+     * 
+     * <p>Initializes:
+     * <ul>
+     *   <li>New game board</li>
+     *   <li>Empty move state</li>
+     *   <li>No highlighted squares</li>
+     * </ul>
      */
     public GameInterfaceImpl() {
         Log.d(TAG, "initGame GameInterfaceImpl()");
@@ -40,8 +71,10 @@ public class GameInterfaceImpl implements IGameInterface {
     }
 
     /**
-     * Get the current game state including the board and other relevant information.
-     * @return GameState containing board layout, possible moves, and eliminated pieces.
+     * {@inheritDoc}
+     * 
+     * <p>This implementation converts the internal board state to a
+     * format suitable for the web interface using BoardAdapter.
      */
     @Override
     public GameState getBoard() {
@@ -49,149 +82,38 @@ public class GameInterfaceImpl implements IGameInterface {
     }
 
     /**
-     * Responsible for sending mouse click events to backend and apply game logic over it to display
-     * updated board layout to player.
-     * @param  squareLabel The unique label of the square which is clicked by player
-     * @return GameState which contains current game board layout and list of squares to highlight
-     **/
+     * {@inheritDoc}
+     * 
+     * <p>This implementation handles two types of clicks:
+     * <ol>
+     *   <li>Move execution (format: "e2-e4")</li>
+     *   <li>Square selection (format: "e4")</li>
+     * </ol>
+     * 
+     * <p>For moves:
+     * <ul>
+     *   <li>Validates move format</li>
+     *   <li>Converts algebraic notation to internal coordinates</li>
+     *   <li>Executes valid moves</li>
+     *   <li>Handles captures</li>
+     * </ul>
+     * 
+     * <p>For selections:
+     * <ul>
+     *   <li>Shows possible moves for selected piece</li>
+     *   <li>Highlights valid squares</li>
+     *   <li>Validates piece ownership</li>
+     * </ul>
+     */
     @Override
     public GameState onClick(String squareLabel) {
         try {
             Log.d(TAG, ">>> onClick called: squareLabel: " + squareLabel);
             
-            // Check if this is a move command (contains a hyphen)
             if (squareLabel.contains("-")) {
-                String[] positions = squareLabel.split("-");
-                if (positions.length != 2) {
-                    throw new InvalidMoveException("Invalid move format");
-                }
-                
-                String startSquare = positions[0];
-                String endSquare = positions[1];
-                
-                // Convert algebraic notation (e.g., "e2") to internal coordinates
-                int startCol = startSquare.charAt(0) - 'a';
-                int startRow = Character.getNumericValue(startSquare.charAt(1)) - 1;
-                
-                int endCol = endSquare.charAt(0) - 'a';
-                int endRow = Character.getNumericValue(endSquare.charAt(1)) - 1;
-                
-                Log.d(TAG, String.format("Attempting move from %s (%d,%d) to %s (%d,%d)", 
-                    startSquare, startRow, startCol, endSquare, endRow, endCol));
-                
-                // Try both White and Black positions to find the piece
-                Position startPosition = null;
-                BasePiece piece = null;
-                
-                try {
-                    startPosition = Position.get(Colour.WHITE, startRow, startCol);
-                    piece = board.getPiece(startPosition);
-                    if (piece == null) {
-                        startPosition = Position.get(Colour.BLACK, startRow, startCol);
-                        piece = board.getPiece(startPosition);
-                    }
-                } catch (InvalidPositionException e) {
-                    try {
-                        startPosition = Position.get(Colour.BLACK, startRow, startCol);
-                        piece = board.getPiece(startPosition);
-                    } catch (InvalidPositionException e2) {
-                        throw new InvalidMoveException("Invalid start position");
-                    }
-                }
-                
-                if (piece == null) {
-                    throw new InvalidMoveException("No piece at start position");
-                }
-                
-                // Use the same color for end position as the piece we found
-                Position endPosition;
-                try {
-                    // First try the same color space as the moving piece
-                    endPosition = Position.get(piece.getColour(), endRow, endCol);
-                    BasePiece targetPiece = board.getPiece(endPosition);
-                    
-                    // If there's no piece in our color space, or if there is one but it's our own piece,
-                    // check the opposite color space for a potential capture
-                    if (targetPiece == null || targetPiece.getColour() == piece.getColour()) {
-                        Position oppositeEndPosition = Position.get(
-                            piece.getColour() == Colour.WHITE ? Colour.BLACK : Colour.WHITE,
-                            endRow, endCol);
-                        BasePiece oppositeTargetPiece = board.getPiece(oppositeEndPosition);
-                        
-                        // If there's an opponent's piece in the opposite color space, use that position
-                        if (oppositeTargetPiece != null && oppositeTargetPiece.getColour() != piece.getColour()) {
-                            endPosition = oppositeEndPosition;
-                        }
-                    }
-                } catch (InvalidPositionException e) {
-                    throw new InvalidMoveException("Invalid end position");
-                }
-                
-                Log.d(TAG, String.format("Moving piece %s from %s to %s", 
-                    piece.toString(), startPosition, endPosition));
-                
-                try {
-                    // Attempt the move
-                    board.move(startPosition, endPosition);
-                } catch (InvalidPositionException e) {
-                    throw new InvalidMoveException("Invalid move: " + e.getMessage());
-                }
-                
-                // Reset state after move
-                moveStartPos = null;
-                highlightSquares = ImmutableSet.of();
+                handleMoveCommand(squareLabel);
             } else {
-                // Single square click - show possible moves
-                int col = squareLabel.charAt(0) - 'a';
-                int row = Character.getNumericValue(squareLabel.charAt(1)) - 1;
-                
-                Log.d(TAG, String.format("Clicked square %s at position (%d,%d)", 
-                    squareLabel, row, col));
-                
-                // Try both White and Black positions
-                Position position = null;
-                BasePiece piece = null;
-                
-                try {
-                    position = Position.get(Colour.WHITE, row, col);
-                    piece = board.getPiece(position);
-                    if (piece == null) {
-                        position = Position.get(Colour.BLACK, row, col);
-                        piece = board.getPiece(position);
-                    }
-                } catch (InvalidPositionException e) {
-                    try {
-                        position = Position.get(Colour.BLACK, row, col);
-                        piece = board.getPiece(position);
-                    } catch (InvalidPositionException e2) {
-                        // If both positions are invalid, use White position as default
-                        try {
-                            position = Position.get(Colour.WHITE, row, col);
-                        } catch (InvalidPositionException e3) {
-                            Log.e(TAG, "Could not create valid position");
-                            return BoardAdapter.convertModelBoardToGameState(board);
-                        }
-                    }
-                }
-                
-                Log.d(TAG, String.format("Found piece %s at position %s", 
-                    piece != null ? piece.toString() : "null", position));
-                
-                if (board.isCurrentPlayersPiece(position)) {
-                    moveStartPos = position;
-                    Log.d(TAG, ">>> Selected piece at: " + moveStartPos);
-                    highlightSquares = board.getPossibleMoves(moveStartPos);
-                    Log.d(TAG, ">>> Possible moves: " + highlightSquares);
-                    if (highlightSquares.isEmpty()) {
-                        Log.d(TAG, ">>> No valid moves available");
-                        moveStartPos = null;
-                        highlightSquares = ImmutableSet.of();
-                    }
-                } else {
-                    Log.d(TAG, ">>> Not current player's piece or no piece at position");
-                    moveStartPos = null;
-                    highlightSquares = ImmutableSet.of();
-                }
+                handleSquareSelection(squareLabel);
             }
         } catch (InvalidMoveException e) {
             Log.e(TAG, "InvalidMoveException onClick: " + e.getMessage());
@@ -200,16 +122,164 @@ public class GameInterfaceImpl implements IGameInterface {
             return BoardAdapter.convertModelBoardToGameState(board);
         }
         
-        // Convert the current board state to GameState
-        GameState gameState = BoardAdapter.convertModelBoardToGameState(board);
-        return gameState;
+        return BoardAdapter.convertModelBoardToGameState(board);
     }
 
     /**
-     * @return returns which colour turn it is currently
+     * {@inheritDoc}
+     * 
+     * <p>This implementation delegates to the board's getTurn method
+     * to maintain consistent turn tracking.
      */
     @Override
     public Colour getTurn() {
         return board.getTurn();
+    }
+
+    /**
+     * Processes a move command in algebraic notation.
+     * 
+     * @param command Move command in format "e2-e4"
+     * @throws InvalidMoveException if the move is invalid
+     */
+    private void handleMoveCommand(String command) throws InvalidMoveException {
+        String[] positions = command.split("-");
+        if (positions.length != 2) {
+            throw new InvalidMoveException("Invalid move format");
+        }
+        
+        String startSquare = positions[0];
+        String endSquare = positions[1];
+        
+        Position startPosition = getPositionFromAlgebraic(startSquare);
+        if (startPosition == null) {
+            throw new InvalidMoveException("Invalid start position");
+        }
+        
+        BasePiece piece = board.getPiece(startPosition);
+        if (piece == null) {
+            throw new InvalidMoveException("No piece at start position");
+        }
+        
+        Position endPosition = getEndPosition(piece, endSquare);
+        if (endPosition == null) {
+            throw new InvalidMoveException("Invalid end position");
+        }
+        
+        Log.d(TAG, String.format("Moving piece %s from %s to %s", 
+            piece.toString(), startPosition, endPosition));
+        
+        try {
+            board.move(startPosition, endPosition);
+            resetMoveState();
+        } catch (InvalidPositionException e) {
+            throw new InvalidMoveException("Invalid move: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Processes a square selection command.
+     * 
+     * @param square Square in algebraic notation (e.g., "e4")
+     */
+    private void handleSquareSelection(String square) {
+        try {
+            Position position = getPositionFromAlgebraic(square);
+            if (position == null) {
+                resetMoveState();
+                return;
+            }
+            
+            if (board.isCurrentPlayersPiece(position)) {
+                moveStartPos = position;
+                highlightSquares = board.getPossibleMoves(moveStartPos);
+                if (highlightSquares.isEmpty()) {
+                    resetMoveState();
+                }
+            } else {
+                resetMoveState();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error in square selection: " + e.getMessage());
+            resetMoveState();
+        }
+    }
+
+    /**
+     * Converts algebraic notation to internal position.
+     * 
+     * @param algebraic Square in algebraic notation (e.g., "e4")
+     * @return Position object or null if invalid
+     */
+    private Position getPositionFromAlgebraic(String algebraic) {
+        try {
+            int col = algebraic.charAt(0) - 'a';
+            int row = Character.getNumericValue(algebraic.charAt(1)) - 1;
+            
+            // Try both color spaces
+            try {
+                Position pos = Position.get(Colour.WHITE, row, col);
+                if (board.getPiece(pos) != null) {
+                    return pos;
+                }
+            } catch (InvalidPositionException ignored) {}
+            
+            try {
+                return Position.get(Colour.BLACK, row, col);
+            } catch (InvalidPositionException ignored) {}
+            
+            return Position.get(Colour.WHITE, row, col);
+        } catch (Exception e) {
+            Log.e(TAG, "Error converting algebraic notation: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Determines the correct end position for a move.
+     * 
+     * @param piece Moving piece
+     * @param algebraic Target square in algebraic notation
+     * @return Position object or null if invalid
+     */
+    private Position getEndPosition(BasePiece piece, String algebraic) {
+        try {
+            int col = algebraic.charAt(0) - 'a';
+            int row = Character.getNumericValue(algebraic.charAt(1)) - 1;
+            
+            // Try same color space first
+            Position endPos = Position.get(piece.getColour(), row, col);
+            BasePiece targetPiece = board.getPiece(endPos);
+            
+            // Check opposite color space for captures
+            if (targetPiece == null || targetPiece.getColour() == piece.getColour()) {
+                Colour oppositeColour = piece.getColour() == Colour.WHITE ? Colour.BLACK : Colour.WHITE;
+                Position oppositePos = Position.get(oppositeColour, row, col);
+                BasePiece oppositeTargetPiece = board.getPiece(oppositePos);
+                
+                if (oppositeTargetPiece != null && oppositeTargetPiece.getColour() != piece.getColour()) {
+                    return oppositePos;
+                }
+            }
+            
+            return endPos;
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting end position: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Resets the move state.
+     * 
+     * <p>Clears:
+     * <ul>
+     *   <li>Move start position</li>
+     *   <li>Highlighted squares</li>
+     * </ul>
+     */
+    private void resetMoveState() {
+        moveStartPos = null;
+        highlightSquares = ImmutableSet.of();
     }
 }

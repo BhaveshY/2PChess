@@ -29,5 +29,16 @@ subprojects {
     java {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    tasks.javadoc {
+        options {
+            (this as CoreJavadocOptions).addStringOption("Xdoclint:none", "-quiet")
+            (this as CoreJavadocOptions).addStringOption("encoding", "UTF-8")
+        }
+        source = sourceSets.main.get().allJava
+        classpath = configurations.compileClasspath.get()
     }
 }

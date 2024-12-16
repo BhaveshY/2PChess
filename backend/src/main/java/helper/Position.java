@@ -1,9 +1,24 @@
 package helper;
 
 /**
- * Class containing the positions enums of the chess board
- * also, methods to access the properties.
- **/
+ * Represents a position on the three-player chess board.
+ * 
+ * <p>This class implements a dual color-space coordinate system where each physical square
+ * can be referenced from both WHITE and BLACK color spaces. This allows for:
+ * <ul>
+ *   <li>Relative piece movement calculations</li>
+ *   <li>Color-specific board perspectives</li>
+ *   <li>Complex move validation</li>
+ *   <li>Piece interaction between color spaces</li>
+ * </ul>
+ * 
+ * <p>Positions are immutable and cached in a static pool to ensure consistency
+ * and memory efficiency.
+ * 
+ * @see Colour
+ * @see Direction
+ * @version 1.0
+ */
 public enum Position {
   // WHITE section positions (bottom)
   A1R(Colour.WHITE, 7, 0), A2R(Colour.WHITE, 6, 0), A3R(Colour.WHITE, 5, 0), A4R(Colour.WHITE, 4, 0),
@@ -45,39 +60,95 @@ public enum Position {
   private final int row;
   private final int column;
 
+  /**
+   * Creates a new position with specified color space and coordinates.
+   * 
+   * <p>This constructor is private to enforce the use of the static factory
+   * method {@link #get(Colour, int, int)} which manages the position pool.
+   * 
+   * @param colour Color space of the position
+   * @param row Row coordinate (0-7)
+   * @param column Column coordinate (0-7)
+   */
   Position(Colour colour, int row, int column) {
     this.colour = colour;
     this.row = row;
     this.column = column;
   }
 
+  /**
+   * Gets the color space of this position.
+   * 
+   * @return Color space (WHITE or BLACK)
+   */
   public Colour getColour() {
     return colour;
   }
 
+  /**
+   * Gets the row coordinate.
+   * 
+   * @return Row number (0-7)
+   */
   public int getRow() {
     return row;
   }
 
+  /**
+   * Gets the column coordinate.
+   * 
+   * @return Column number (0-7)
+   */
   public int getColumn() {
     return column;
   }
 
+  /**
+   * Converts position to standard chess notation.
+   * 
+   * <p>For example:
+   * <ul>
+   *   <li>(0,0) -> "a8"</li>
+   *   <li>(4,4) -> "e4"</li>
+   *   <li>(7,7) -> "h1"</li>
+   * </ul>
+   * 
+   * @return Position in algebraic chess notation
+   */
   @Override
   public String toString() {
-    // Convert to standard chess notation (e.g., "e2")
     return String.format("%c%d", getColumnChar(column), 8 - row);
   }
 
+  /**
+   * Gets a position from the position pool or creates a new one.
+   * 
+   * <p>This method ensures that only one Position object exists for each
+   * unique combination of color space and coordinates.
+   * 
+   * @param colour Color space of the position
+   * @param row Row coordinate (0-7)
+   * @param column Column coordinate (0-7)
+   * @return Position object from the pool
+   * @throws InvalidPositionException if coordinates are invalid
+   */
   public static Position get(Colour colour, int row, int column) throws InvalidPositionException {
     for (Position position : Position.values()) {
       if (position.colour == colour && position.row == row && position.column == column) {
         return position;
       }
     }
-    throw new InvalidPositionException(String.format("No such position: colour=%s, row=%d, column=%d", colour, row, column));
+    throw new InvalidPositionException(
+        String.format("No such position: colour=%s, row=%d, column=%d", 
+        colour, row, column));
   }
 
+  /**
+   * Converts column number to chess notation letter.
+   * 
+   * @param column Column number (0-7)
+   * @return Chess notation letter (a-h)
+   */
   private char getColumnChar(int column) {
     switch (column) {
       case 0: return 'a';
@@ -92,26 +163,39 @@ public enum Position {
     }
   }
 
+  /**
+   * Gets the neighboring position in the specified direction.
+   * 
+   * <p>This method handles:
+   * <ul>
+   *   <li>Color-specific movement (WHITE moves up, BLACK moves down)</li>
+   *   <li>Board boundaries</li>
+   *   <li>Direction translation</li>
+   * </ul>
+   * 
+   * @param direction Movement direction
+   * @return Position after moving in the specified direction
+   * @throws InvalidPositionException if the move would go off the board
+   */
   public Position neighbour(Direction direction) throws InvalidPositionException {
     int newRow = this.row;
     int newColumn = this.column;
 
     switch (direction) {
       case FORWARD:
-        newRow = (this.colour == Colour.WHITE) ? newRow - 1 : newRow + 1;  // White moves up (decreasing row), Black moves down (increasing row)
+        newRow = (this.colour == Colour.WHITE) ? newRow - 1 : newRow + 1;
         break;
       case BACKWARD:
-        newRow = (this.colour == Colour.WHITE) ? newRow + 1 : newRow - 1;  // White moves down (increasing row), Black moves up (decreasing row)
+        newRow = (this.colour == Colour.WHITE) ? newRow + 1 : newRow - 1;
         break;
       case LEFT:
-        newColumn--;  // Moving left decreases column
+        newColumn--;
         break;
       case RIGHT:
-        newColumn++;  // Moving right increases column
+        newColumn++;
         break;
     }
 
-    // Always use the same color space as the moving piece
     return Position.get(this.colour, newRow, newColumn);
   }
 }
