@@ -30,10 +30,11 @@ jobs:
     - name: Run unit tests
       run: ./gradlew test  # Run unit tests and generate results in JUnit format
 
-    - name: Upload JUnit Test Results
-      uses: dawidd6/action-import-test-results@v2
+    - name: Upload JUnit Test Results as Artifacts
+      uses: actions/upload-artifact@v3
       with:
-        test-results: 'build/test-results/test/*.xml'  # Path to the test results
+        name: junit-test-results
+        path: build/test-results/test/*.xml  # Path to the test results
 
     - name: Package webapp as JAR
       run: ./gradlew :webapp:bootJar
