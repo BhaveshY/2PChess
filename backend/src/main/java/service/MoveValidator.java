@@ -128,8 +128,5 @@ public class MoveValidator {
         if (!isValidMove(board, start, end)) {
             throw new InvalidMoveException("Invalid move for this piece");
         }
-
-        // For now, we'll rely on the Board class's internal validation
-        // since it has access to the private isCheck method
     }
 } 

@@ -57,7 +57,7 @@ function handleSquareClick(squareId) {
         highlightSquare(squareId, 'rgba(0, 255, 0, 0.3)'); // Green highlight for selected square
     } else {
         // Second click - attempt to move
-        const moveCommand = `${selectedSquare}-${squareId}`; // Add separator between positions
+        const moveCommand = `${selectedSquare}-${squareId}`; // Adds separator between positions
         sendPolygonClicked(moveCommand);
         unhighlightSquare(selectedSquare);
         selectedSquare = null;
