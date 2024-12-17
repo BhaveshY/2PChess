@@ -1,8 +1,6 @@
 plugins {
-    id 'org.springframework.boot' version '2.7.17'
+    id 'org.springframework.boot' version '3.1.7'
     id 'java'
-    id 'io.spring.dependency-management' version '1.1.3'
-    // Recommended for dependency management
 }
 
 repositories {
@@ -10,33 +8,54 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'com.google.guava:guava:31.1-jre'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // Spring Boot starter for web applications
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.1.7'
+
+    // Google Guava library
+    implementation 'com.google.guava:guava:32.1.2-jre'
+
+    testImplementation 'org.mockito:mockito-core:4.0.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.0.0'
+
+    // Spring Boot starter for testing (includes JUnit 5)
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.1.7'
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
+// Configure Spring Boot and Gradle jar tasks
 bootJar {
-    mainClass = 'application.SpringApplication' // Update with your actual main class
+    // Set the main class for Spring Boot to run
+    mainClass = 'application.SpringApplication'  // Replace with the actual fully qualified main class
 }
 
 jar {
+    // Exclude duplicate files during packaging
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     manifest {
-        attributes 'Main-Class': 'application.SpringApplication' // Update with your actual main class
+        // Explicitly set the Main-Class attribute for the jar manifest
+        attributes 'Main-Class': 'application.SpringApplication'  // Replace with the actual main class
     }
 
+    // Add runtime classpath resources to the jar
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 
-tasks.withType(Test).configureEach {
-    useJUnitPlatform() // Enables modern JUnit 5 testing platform if needed
-    enabled = false    // Disable tests for faster builds (optional)
+test {
+    useJUnitPlatform()  // Enable if you're using JUnit 5
+
+    // Configure test report generation
+    reports {
+        junitXml {
+            destination = file("$buildDir/test-results/test")  // Set the destination for XML reports
+            // By default, JUnit XML report generation is enabled, so no need to explicitly set 'enabled'
+        }
+    }
 }

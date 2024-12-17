@@ -7,3 +7,5 @@
  */
 
 rootProject.name = "3-Player-Chess-main-2"
+include("backend")
+include("webapp")

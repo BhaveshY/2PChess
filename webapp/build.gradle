@@ -1,18 +1,16 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.0.0'  // or latest 3.x version
-
-    id 'io.spring.dependency-management' version '1.1.4'  // or latest stable version
-
+    id 'org.springframework.boot' version '3.1.7' // Update to a Spring Boot version compatible with Java 17
+    id 'io.spring.dependency-management' version '1.1.4'
 }
 
-group = 'org.example'
-version = '1.0-SNAPSHOT'
-
+// Specify Java compatibility explicitly
 java {
-    sourceCompatibility = JavaVersion.VERSION_21 // or JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21  // or JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
+group = 'org.example'
+version = 'unspecified'
 
 
 repositories {
@@ -20,19 +18,18 @@ repositories {
 }
 
 dependencies {
-    implementation project(':backend') // Backend module dependency
+    implementation project(':backend')
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-// Ensure tasks are configured only when necessary
-tasks.withType(Test).configureEach {
-    useJUnitPlatform()
-    enabled = false // Disable tests for faster builds
+test {
+    enabled = false  // Disable tests for faster builds
 }
 
 bootJar {
-    mainClass = 'application.SpringApplication' // Update with your actual main class
+    enabled = true
+    mainClass = 'org.example.webapp.WebApplication'
 }
-

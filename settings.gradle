@@ -1,4 +1,4 @@
-rootProject.name = 'Coding-Ninjas-Chess'
+rootProject.name = 'Bug-Free-Brigade'
 include 'webapp'
 include 'backend'
 
