@@ -8,16 +8,24 @@
 2. **Open/Closed (O)**
    - Open for extension, closed for modification
    - Example: Add new features through new classes, don't modify existing ones
+     
+3. **Dependency Injection Principle (D)**
+    - Injects external dependencies into a class
+    - Example: Injecting a service into a controller class
 
-3. **Liskov Substitution (L)**
+4. **Law of Demeter (L)**
+   - Objects should only talk to their immediate friends
+   - Example: A class should only call methods of its own fields        
+     
+5. **Liskov Substitution (L)**
    - Child classes should work wherever parent classes are used
    - Example: A Square class should work anywhere a Rectangle class is expected
 
-4. **Interface Segregation (I)**
+6. **Interface Segregation (I)**
    - Keep interfaces small and focused
    - Example: Split large interfaces into smaller, specific ones
 
-5. **Dependency Inversion (D)**
+7. **Dependency Inversion (D)**
    - Depend on abstractions, not concrete implementations
    - Example: Use interfaces instead of specific classes
 
@@ -69,6 +77,13 @@ Search for: `[OCP]`
 - MoveValidator.java - Line 23: Move validation can be extended
 - MoveValidator.java - Line 53: New validation rules can be added without modification
 - MovementUtil.java - Movement calculation is open for extension through new Direction types but closed for modification
+
+## Dependency Injection Principle (DIP)
+- GameController.java - Lines 43-45: Dependency injection through @Autowired annotation.
+
+## Law of Demeter (LoD)
+_ GameController.Java - Lines 114-118 : Refactored to solve LoD violation
+- GameInterfaceImpl.Java - Lines 134-137
 
 ## Liskov Substitution Principle (LSP)
 Search for: `[LSP]`

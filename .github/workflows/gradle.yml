@@ -3,45 +3,44 @@ name: Java CI with Gradle
 on:
   push:
     branches:
-      - develop
-      - main  
-
-permissions:
-  contents: read
+      - main  # Trigger CI on push to the 'main' branch
+  pull_request:
+    branches:
+      - main  # Trigger CI on pull requests targeting 'main'
 
 jobs:
   build:
+    runs-on: ubuntu-latest  # Set the environment for the job
 
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: [23]  # Run the CI job on multiple Java versions
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      # 1. Checkout code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
+      # 2. Set up Java JDK (specified by the matrix)
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v2
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'  # Use Temurin JDK
 
-    - name: Build backend and webapp
-      run: ./gradlew clean build
+      # 3. Cache Gradle dependencies to speed up subsequent builds
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
-    - name: Run unit tests
-      run: ./gradlew test  # Run unit tests and generate results in JUnit format
+      # 4. Build the application with Gradle (compile code, resolve dependencies)
+      - name: Build with Gradle
+        run: ./gradlew build --no-daemon  # The '--no-daemon' flag is useful for CI environments
 
-    - name: Upload JUnit Test Results as Artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: junit-test-results
-        path: build/test-results/test/*.xml  # Path to the test results
-
-    - name: Package webapp as JAR
-      run: ./gradlew :webapp:bootJar
-        
-    - name: Upload JAR artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: app-artifacts
-        path: |
-          webapp/build/libs/*.jar
+      # 5. Run unit tests with Gradle
+      - name: Run tests with Gradle
+        run: ./gradlew test --no-daemon
